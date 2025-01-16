@@ -1,76 +1,109 @@
-const { outcomes } = require('../Outcomes/outcomes');
-const { MultiplierData } = require('../scripts/multipliers');
+const { outcomes } = require("../Outcomes/outcomes");
+const { MultiplierData } = require("../scripts/multipliers");
+const { validationResult } = require("express-validator");
 
-// const TOTAL_DROPS = 16;
+// Simulated wallet balance
+let CREDITS = 10000;
 
-// const MULTIPLIERS = {
-//     0: 16,
-//     1: 9,
-//     2: 2,
-//     3: 1.4,
-//     4: 1.4,
-//     5: 1.2,
-//     6: 1.1,
-//     7: 1,
-//     8: 0.5,
-//     9: 1,
-//     10: 1.1,
-//     11: 1.2,
-//     12: 1.4,
-//     13: 1.4,
-//     14: 2,
-//     15: 9,
-//     16: 16
-// };
+/**
+ * Handle validation errors from request
+ * @param {Object} req - Express request object
+ * @param {Object} res - Express response object
+ * @returns {Object|null} - Validation errors response or null
+ */
+const handleValidationErrors = (req, res) => {
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+        return res.status(400).json({ errors: errors.array() });
+    }
+    return null;
+};
 
+/**
+ * Calculate the outcome of the game and return the result
+ * @param {Object} req - Express request object
+ * @param {Object} res - Express response object
+ */
 const calculateGameOutcome = async (req, res) => {
-    const { rows, risk } = req.body;
+    const validationError = handleValidationErrors(req, res);
+    if (validationError) return;
 
-    if (!MultiplierData[risk]) {
-        return res.status(400).json({ error: "Invalid risk level provided" });
+    const { rows, risk, currency, betAmount } = req.body;
+
+    // Validate betAmount against available credits
+    if (betAmount > CREDITS) {
+        return res
+            .status(400)
+            .json({ error: "Insufficient credits for the specified bet amount." });
     }
 
-    if (!rows || rows < 8 || rows > 16) {
-        return res.status(400).json({ error: "Invalid rows provided" });
-    }
-
+    // Initialize outcome and game pattern
     let outcome = 0;
-    const pattern = []
-    for (let i = 0; i < rows; i++) {
+    const pattern = Array.from({ length: rows }, () => {
         if (Math.random() > 0.5) {
-            pattern.push("R")
             outcome++;
-        } else {
-            pattern.push("L")
+            return "R"; // Right movement
         }
-    }
+        return "L"; // Left movement
+    });
 
-    const multipliers = MultiplierData[risk][rows];
-
+    // Retrieve multipliers for the given risk and rows
+    const multipliers = MultiplierData[risk]?.[rows];
     if (!multipliers) {
-        return res.status(400).json({ error: "Invalid number of rows for the specified risk" });
+        return res
+            .status(400)
+            .json({ error: "Invalid number of rows for the specified risk level." });
     }
-    const multiplier = multipliers[outcome];
+
+    const multiplier = multipliers[outcome] || 0;
+
+    // Retrieve possible outcomes for the calculated outcome
     const possibleOutcomes = outcomes[outcome];
     if (!possibleOutcomes || possibleOutcomes.length === 0) {
-        return res.status(400).json({ error: "No possible outcomes found for the given outcome" });
+        return res.status(400).json({
+            error: "No possible outcomes found for the given game configuration.",
+        });
     }
-    // console.log("Outcome >>>>> ", outcome);
-    // console.log("Multiplier >>>>> ", multiplier);
-    // console.log("possiblieOutcomes >>>> ", possiblieOutcomes);
-    // const point = possiblieOutcomes[Math.floor(Math.random() * possiblieOutcomes.length || 0)];
-    // console.log("Point >>>> ", point);
-    res.json({
-        point: possibleOutcomes[Math.floor(Math.random() * possibleOutcomes.length || 0)],
+
+    // Randomly select a sink position (point)
+    const randomIndex = Math.floor(Math.random() * possibleOutcomes.length);
+    const point = possibleOutcomes[randomIndex];
+
+    // Calculate payout and update credits
+    const payout = Math.round(multiplier * betAmount); // Ensure payout is rounded
+    CREDITS -= betAmount; // Deduct the bet amount
+    CREDITS += payout; // Add the payout (if any)
+
+    // Formulate the response
+    const response = {
+        point,
         multiplier,
-        pattern,
         rows,
-        risk
+        risk,
+        betAmount,
+        currency,
+        payout,
+        remainingCredits: CREDITS, // Updated wallet balance
+        pattern, // Path taken by the ball
+    };
+
+    console.log("Game Outcome Response: ", response);
+    return res.json(response);
+};
+
+/**
+ * Get the current wallet balance
+ * @param {Object} req - Express request object
+ * @param {Object} res - Express response object
+ */
+const getWallet = (req, res) => {
+    res.json({
+        remainingCredits: CREDITS,
+        currency: "USDT",
     });
-}
-
-
+};
 
 module.exports = {
-    calculateGameOutcome
+    calculateGameOutcome,
+    getWallet,
 };
