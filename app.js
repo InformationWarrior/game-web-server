@@ -1,6 +1,7 @@
 const express = require('express');
 const app = express();
-const laserBlastRouter = require('./Games/LaserBlast/routes/LaserBlast.routes');
+const pachinkoRouter = require('./App/Games/Pachinko/routes/Pachinko.routes');
+const wheelSpinRouter = require("./App/Games/WheelSpin/routes/wheelSpin.routes");
 const cors = require('cors');
 
 
@@ -10,8 +11,8 @@ app.use(cors({
 }));
 
 app.use(express.json());
-app.use('/api/laser-blast', laserBlastRouter);
-
+app.use('/api/pachinko', pachinkoRouter);
+app.use('/api/wheelSpin', wheelSpinRouter);
 
 
 module.exports = app;
