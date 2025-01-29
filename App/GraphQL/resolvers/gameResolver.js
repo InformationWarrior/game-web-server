@@ -1,5 +1,5 @@
-const Game = require('../../../../App/Games/WheelSpin/models/game');
-const Player = require('../../../../App/Games/WheelSpin/models/player');
+const Game = require('../../models/game');
+const Player = require('../../models/player');
 
 const gameResolver = {
   Query: {

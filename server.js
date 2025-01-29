@@ -1,9 +1,9 @@
 require('dotenv').config();
 const http = require('http');
 const { Server } = require('socket.io');
-const expressApp = require('./src/bootstrap/expressApp');
-const dbConnect = require('./src/config/dbConnect');
-const apolloServer = require('.src/bootstrap/apolloServer');
+const expressApp = require('./App/bootstrap/expressApp');
+const dbConnect = require('./App/config/dbConnect');
+const apolloServer = require('./App/bootstrap/apolloServer');
 
 const PORT = process.env.PORT || 5000;
 

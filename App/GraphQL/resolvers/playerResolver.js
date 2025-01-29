@@ -1,4 +1,4 @@
-const Player = require('../../../../App/Games/WheelSpin/models/player');
+const Player = require('../../models/player');
 
 const playerResolver = {
   Query: {

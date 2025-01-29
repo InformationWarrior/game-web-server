@@ -1,6 +1,6 @@
 const { ApolloServer } = require('apollo-server-express');
 const { PubSub } = require('graphql-subscriptions');
-const { typeDefs, resolvers } = require('../../src/api/graphql/schema');
+const { typeDefs, resolvers } = require('../GraphQL/schema');
 
 // Set up PubSub for subscriptions
 const pubsub = new PubSub();
