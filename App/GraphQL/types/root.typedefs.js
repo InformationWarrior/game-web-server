@@ -4,15 +4,15 @@ const rootType = gql`
   scalar ObjectId
 
   type Query {
-    getWheelSpinSelections: [Selection]
+    getPlacedBets: [PlayerBetInput]
   }
 
   type Mutation {
-    addSelection(betAmount: Float!, totalPlayerRounds: Int!, currency: String!): AddSelectionResponse
+    placeBet(betAmount: Float!, totalPlayerRounds: Int!, currency: String!): PlayerBetResult
   }
 
   type Subscription {
-    selectionAdded: Selection
+    betPlaced: PlayerBetResult
   }
 `;
 

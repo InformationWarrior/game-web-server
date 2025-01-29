@@ -2,32 +2,37 @@ const { PubSub } = require('graphql-subscriptions');
 const pubsub = new PubSub();
 
 const wheelSpinResolver = {
-  Query: {
-    getWheelSpinSelections: async (_, __, { models }) => {
-      return await models.Selection.find();
-    },
-  },
-
   Mutation: {
-    addSelection: async (_, { betAmount, totalPlayerRounds, currency }) => {
+    placeBet: async (_, { currency, betAmount, totalPlayerRounds }) => {
       try {
-        console.log("Saving selection:", { betAmount, totalPlayerRounds, currency });
+        const placedBet = {
+          _id: new Date().toISOString(), // Replace with actual DB ID
+          currency,
+          betAmount,
+          totalPlayerRounds,
+        };
+
+        console.log(placedBet);
+        // Publish event for subscriptions
+        pubsub.publish("BET_PLACED", { betPlaced: { success: true, message: "Bet placed!", placedBet } });
+
         return {
           success: true,
-          message: "Selection added successfully!",
+          message: "Bet placed successfully!",
+          placedBet,
         };
       } catch (error) {
         return {
           success: false,
-          message: `Failed to add selection: ${error.message}`,
+          message: `Failed to place bet: ${error.message}`,
         };
       }
     },
   },
 
   Subscription: {
-    selectionAdded: {
-      subscribe: () => pubsub.asyncIterator(["SELECTION_ADDED"]),
+    betPlaced: {
+      subscribe: () => pubsub.asyncIterator(["BET_PLACED"]),
     },
   },
 };

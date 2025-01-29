@@ -1,8 +1,8 @@
-const addSelection = require('./wheelSpin.resolver').addSelection;
+const { placeBet } = require('./wheelSpin.resolver');
 
 const mutationResolver = {
   Mutation: {
-    addSelection,
+    placeBet,
   },
 };
 

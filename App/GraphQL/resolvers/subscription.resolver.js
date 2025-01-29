@@ -1,7 +1,7 @@
-const selectionAdded = require('./wheelSpin.resolver').selectionAdded;
+const { betPlaced } = require('./wheelSpin.resolver');
 const subscriptionResolver = {
   Subscription: {
-    selectionAdded,
+    betPlaced,
   },
 };
 
