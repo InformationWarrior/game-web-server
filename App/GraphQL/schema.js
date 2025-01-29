@@ -1,13 +1,13 @@
 const { mergeResolvers, mergeTypeDefs } = require('@graphql-tools/merge');
 
-const objectIdScalar = require('./modules/wheelSpin/scalars/objectIdScalar');
+const objectIdScalar = require('./scalars/objectIdScalar');
 
 const rootType = require('./types/rootType');
-const gameType = require('./modules/wheelSpin/types/gameType');
-const playerType = require('./modules/wheelSpin/types/playerType');
+const gameType = require('./types/gameType');
+const playerType = require('./types/playerType');
 
-const gameResolver = require('./modules/wheelSpin/resolvers/gameResolver');
-const playerResolver = require('./modules/wheelSpin/resolvers/playerResolver');
+const gameResolver = require('./resolvers/gameResolver');
+const playerResolver = require('./resolvers/playerResolver');
 const mutationResolver = require('./resolvers/mutationResolver');
 const subscriptionResolver = require('./resolvers/subscriptionResolver');
 
