@@ -1,9 +1,6 @@
 const queryResolvers = {
     Query: {
-        getGameStatus: () => ({
-            state: "RESET",
-            remainingTime: 10,
-        }),
+        getGameStatus: () => currentGameState,
         //getPlacedBets: () => [],
     },
 };

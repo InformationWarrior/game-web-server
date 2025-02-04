@@ -1,11 +1,13 @@
-// const mongoose = require('mongoose')
+const mongoose = require('mongoose')
 
-// const playerSchema = new mongoose.Schema({
-//   name: { type: String, required: true },
-//   score: { type: Number, default: 0 },
-//   gameId: { type: mongoose.Schema.Types.ObjectId, ref: 'Game' }
-// })
+const playerSchema = new mongoose.Schema({
 
-// const Player = mongoose.model('Player', playerSchema)
+    //Check unique
+    walletAddress: { type: String, required: true, unique: true },
+    score: { type: Number, default: 0 },
+    gameId: { type: mongoose.Schema.Types.ObjectId, ref: 'Game' }
+})
 
-// module.exports = Player
+const Player = mongoose.model('Player', playerSchema)
+
+module.exports = Player
