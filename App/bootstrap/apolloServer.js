@@ -9,4 +9,4 @@ const apolloServer = new ApolloServer({
     }),
 });
 
-module.exports = { apolloServer, pubsub };
+module.exports = { apolloServer, schema, pubsub };
