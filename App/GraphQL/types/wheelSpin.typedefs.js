@@ -1,6 +1,20 @@
 const { gql } = require('apollo-server-express');
 
 const wheelSpinTypeDefs = gql`
+  extend type Query {
+    getPlacedBets: [PlayerBetInput]
+    getGameStatus: GameStatus!
+  }
+
+  extend type Mutation {
+    placeBet(betAmount: Float!, totalPlayerRounds: Int!, currency: String!): PlayerBetResult
+  }
+
+  extend type Subscription {
+    betPlaced: PlayerBetResult
+    gameStatusUpdated: GameStatus!
+  }
+
   type PlayerBetInput {
     _id: ObjectId!
     betAmount: Float!
@@ -11,11 +25,19 @@ const wheelSpinTypeDefs = gql`
   type PlayerBetResult {
     success: Boolean!
     message: String!
-    placedBet: PlayerBetInput
+    bet: PlayerBetInput
   }
 
-  extend type Mutation {
-    placeBet(currency: String!, betAmount: Float!, totalPlayerRounds: Int!): PlayerBetResult
+  enum GameState {
+    RESET
+    BETTING
+    SPINNING
+    END
+  }
+
+  type GameStatus {
+    state: GameState!
+    remainingTime: Int!
   }
 `;
 

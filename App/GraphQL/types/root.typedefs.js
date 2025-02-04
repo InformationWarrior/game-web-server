@@ -4,15 +4,15 @@ const rootType = gql`
   scalar ObjectId
 
   type Query {
-    getPlacedBets: [PlayerBetInput]
+    _empty: String
   }
 
   type Mutation {
-    placeBet(betAmount: Float!, totalPlayerRounds: Int!, currency: String!): PlayerBetResult
+    _empty: String
   }
 
   type Subscription {
-    betPlaced: PlayerBetResult
+    _empty: String
   }
 `;
 
