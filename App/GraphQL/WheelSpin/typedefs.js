@@ -3,7 +3,7 @@ const { gql } = require('apollo-server-express');
 const wheelSpinTypeDefs = gql`
   extend type Query {
     getPlacedBets: [PlayerBetInput]
-    getGameStatus: GameStatus!
+    getGameState: GameState!
   }
 
   extend type Mutation {
@@ -12,7 +12,7 @@ const wheelSpinTypeDefs = gql`
 
   extend type Subscription {
     betPlaced: PlayerBetResult
-    gameStatusUpdated: GameStatus!
+    gameStateUpdated: GameState!
   }
 
   type PlayerBetInput {

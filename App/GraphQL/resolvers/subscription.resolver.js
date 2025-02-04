@@ -1,8 +1,8 @@
-const { betPlaced } = require('./wheelSpin.resolver');
-const subscriptionResolver = {
-  Subscription: {
-    betPlaced,
-  },
-};
+// const { betPlaced } = require('../WheelSpin/resolver');
+// const subscriptionResolver = {
+//   Subscription: {
+//     betPlaced,
+//   },
+// };
 
-module.exports = subscriptionResolver;
+// module.exports = subscriptionResolver;

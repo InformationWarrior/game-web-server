@@ -1,9 +1,10 @@
 require('dotenv').config();
 const http = require('http');
-const { Server } = require('socket.io');
-const expressApp = require('./App/bootstrap/expressApp');
 const dbConnect = require('./App/config/dbConnect');
+const expressApp = require('./App/bootstrap/expressApp');
 const apolloServer = require('./App/bootstrap/apolloServer');
+const setupSocketServer = require('./App/bootstrap/socketServer');
+const startBackgroundTasks = require("./App/GraphQL/WheelSpin/backgroundTasks")
 
 const PORT = process.env.PORT || 5000;
 
@@ -11,12 +12,12 @@ const PORT = process.env.PORT || 5000;
 const server = http.createServer(expressApp);
 
 // Initialize Socket.io
-const io = new Server(server, {
-    cors: {
-        origin: '*',
-        methods: ['GET', 'POST'],
-    },
-});
+// const io = new Server(server, {
+//     cors: {
+//         origin: '*',
+//         methods: ['GET', 'POST'],
+//     },
+// });
 
 // Start the server
 (async () => {
@@ -30,23 +31,13 @@ const io = new Server(server, {
 
         console.log(`GraphQL API is available at http://localhost:${PORT}${apolloServer.graphqlPath}`);
 
-        // Handle Socket.io connections
-        io.on('connection', (socket) => {
-            console.log('New client connected');
-
-            socket.on('playerJoined', (player) => {
-                console.log(`Player joined: ${player.name}`);
-                io.emit('playerJoined', player);
-            });
-
-            socket.on('disconnect', () => {
-                console.log('Client disconnected');
-            });
-        });
+        // Initialize WebSocket server
+        setupSocketServer(server);
 
         // Start the HTTP server
         server.listen(PORT, () => {
             console.log(`Server is up and running at http://localhost:${PORT}...`);
+            startBackgroundTasks();
         });
     } catch (error) {
         console.error('Error starting the server:', error);

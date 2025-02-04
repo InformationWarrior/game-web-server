@@ -1,9 +1,9 @@
-const { placeBet } = require('./wheelSpin.resolver');
+// const { placeBet } = require('../WheelSpin/resolver');
 
-const mutationResolver = {
-  Mutation: {
-    placeBet,
-  },
-};
+// const mutationResolver = {
+//   Mutation: {
+//     placeBet,
+//   },
+// };
 
-module.exports = mutationResolver;
+// module.exports = mutationResolver;
