@@ -7,7 +7,7 @@ const subscriptionResolvers = {
         //     subscribe: () => pubsub.subscribe([BET_PLACED]),
         // },
         gameStatusUpdated: {
-            subscribe: () => pubsub.subscribe([GAME_STATUS_UPDATED]),
+            subscribe: () => pubsub.subscribe(GAME_STATUS_UPDATED),
         },
     },
 };

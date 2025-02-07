@@ -36,7 +36,7 @@ const wheelSpinTypeDefs = gql`
   }
 
   type GameStatus {
-    gameState: String!
+    gameState: GameState!
     remainingTime: Int!
   }
 `;
