@@ -1,10 +1,10 @@
 const queryResolvers = require("./query");
-// const mutationResolvers = require("./mutation");
+const mutationResolvers = require("./mutation");
 const subscriptionResolvers = require("./subscription");
 
 const resolvers = {
   ...queryResolvers,
-  ///...mutationResolvers,
+  ...mutationResolvers,
   ...subscriptionResolvers,
 };
 

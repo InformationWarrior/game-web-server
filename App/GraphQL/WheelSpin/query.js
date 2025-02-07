@@ -1,7 +1,6 @@
 const queryResolvers = {
     Query: {
         getGameStatus: () => currentGameState,
-        //getPlacedBets: () => [],
     },
 };
 
