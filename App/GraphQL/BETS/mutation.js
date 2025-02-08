@@ -1,5 +1,6 @@
 const Game = require('../../models/game');
 const Player = require('../../models/player');
+const { saveWalletData } = require('./services/walletService');
 
 const mutationResolver = {
     Mutation: {
@@ -75,6 +76,10 @@ const mutationResolver = {
                     message: `Failed to add selection: ${error.message}`,
                 };
             }
+        },
+
+        saveWalletData: async (_, { address, balance, currency }) => {
+            return saveWalletData(address, balance, currency);
         },
     },
 };

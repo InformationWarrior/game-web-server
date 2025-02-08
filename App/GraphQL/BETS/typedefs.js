@@ -15,6 +15,8 @@ const betsTypeDefs = gql`
     createGame(name: String!): Game
     makeMove(gameId: ObjectId!, move: String!): Game
     addSelection(betAmount: Float!, totalPlayerRounds: Int!, currency: String!): AddSelectionResponse
+
+    saveWalletData(address: String!, balance: Float!, currency: String!): WalletResponse!
   }
 
   extend type Subscription {
@@ -54,6 +56,11 @@ const betsTypeDefs = gql`
     success: Boolean!
     message: String!
     selection: Selection
+  }
+
+  type WalletResponse {
+    success: Boolean!
+    message: String!
   }
 `;
 
