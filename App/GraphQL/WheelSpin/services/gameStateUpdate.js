@@ -1,5 +1,5 @@
 const pubsub = require("../../pubsub");
-const { GAME_STATUS_UPDATED } = require("../constants");
+const { GAME_STATUS_UPDATED } = require("./constants");
 
 // Define your game states with a duration (full time) for each
 const GAME_STATES = {
@@ -22,7 +22,7 @@ const gameStateUpdate = () => {
 const updateState = () => {
   // Publish the current state with the current remainingTime
   pubsub.publish(GAME_STATUS_UPDATED, { gameStatusUpdated: currentGameState });
-  console.log("📢 Game State Update:", currentGameState);
+  // console.log("📢 Game State Update:", currentGameState);
 
   // If remaining time is greater than 0, decrement and schedule the next update in 1 second
   if (currentGameState.remainingTime > 0) {

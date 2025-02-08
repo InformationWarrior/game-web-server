@@ -1,5 +1,5 @@
 const pubsub = require("../pubsub");
-const { BET_PLACED, GAME_STATUS_UPDATED } = require("./constants");
+const { GAME_STATUS_UPDATED } = require("./services/constants");
 
 const subscriptionResolvers = {
     Subscription: {
