@@ -1,4 +1,4 @@
-const pubsub = require("../../pubsub");
+const pubsub = require("../../../pubsub");
 const { GAME_STATUS_UPDATED } = require("./constants");
 
 // Define your game states with a duration (full time) for each

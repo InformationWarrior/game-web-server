@@ -1,4 +1,4 @@
-const pubsub = require("../pubsub");
+const pubsub = require("../../pubsub");
 const { GAME_STATUS_UPDATED } = require("./services/constants");
 
 const subscriptionResolvers = {

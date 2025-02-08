@@ -1,8 +1,8 @@
 const { mergeResolvers } = require('@graphql-tools/merge');
 
 const objectIdScalar = require('../scalars/objectIdScalar');
-const betsResolver = require('../BETS/resolver')
-const wheelSpinResolver = require('../WheelSpin/resolver');
+const betsResolver = require('../modules/BETS/resolver')
+const wheelSpinResolver = require('../modules/WheelSpin/resolver');
 
 const resolvers = mergeResolvers([
     { ObjectId: objectIdScalar },
