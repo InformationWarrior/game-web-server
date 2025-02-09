@@ -1,6 +1,6 @@
-const { createGame, joinGame } = require("./services/gameService");
 const { createPlayer } = require("./services/playerService");
-const { saveWalletData } = require('./services/walletService');
+const { createGame, joinGame } = require("./services/gameService");
+const { saveWalletData } = require("./services/walletService");
 
 const mutationResolver = {
     Mutation: {
@@ -21,5 +21,6 @@ const mutationResolver = {
         },
     },
 };
+
 
 module.exports = mutationResolver;
