@@ -1,22 +1,18 @@
-const Game = require('../../../models/game');
-const Player = require('../../../models/player');
+const { getGames, getGameById } = require("./services/gameService");
+const { getPlayers } = require("./services/playerService");
 
 const queryResolver = {
     Query: {
-        games: async () => await Game.find().populate('players'),
-        game: async (_, { id }) => {
-            const game = await Game.findById(id).populate('players');
-            if (!game) throw new Error('Game not found');
-            return game;
+        games: async () => {
+            return await getGames();
         },
-        players: async () => await Player.find(),
-        players: async (_, __, { models }) => await models.Player.find(),
-        games: async (_, __, { models }) => await models.Game.find(),
-        game: async (_, { id }, { models }) => await models.Game.findById(id),
-        getWheelSpinSelections: async (_, __, { models }) => await models.Selection.find(),
 
-        getWheelSpinSelections: async (_, __, { models }) => {
-            return await models.Selection.find();
+        game: async (_, { id }) => {
+            return await getGameById(id);
+        },
+
+        players: async () => {
+            return await getPlayers();
         },
     },
 };

@@ -3,7 +3,13 @@ const cors = require('cors');
 
 const expressApp = express();
 
-expressApp.use(cors({ origin: 'http://localhost:3000', methods: ['GET', 'POST'] }));
+const corsOptions = {
+    origin: '*', // Allow all origins (change to specific domain in production)
+    credentials: true,
+    methods: ['GET', 'POST']
+  };
+
+expressApp.use(cors(corsOptions));
 expressApp.use(express.json());
 
 module.exports = expressApp;

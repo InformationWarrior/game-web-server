@@ -5,7 +5,9 @@ const ObjectIdScalar = new GraphQLScalarType({
   name: 'ObjectId',
   description: 'Custom scalar type for MongoDB ObjectId',
   serialize(value) {
+    if (!value) return null;
     if (value instanceof ObjectId) return value.toString();
+    if (typeof value === "string") return value;
     throw new Error('Invalid ObjectId');
   },
   parseValue(value) {

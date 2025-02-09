@@ -1,14 +1,16 @@
+const { withFilter } = require("graphql-subscriptions");
+
 const subscriptionResolver = {
   Subscription: {
+    gameUpdated: {
+      subscribe: withFilter(
+        (_, __, { pubsub }) => pubsub.subscribe("GAME_UPDATED"),
+        (payload, variables) => payload.gameUpdated._id.toString() === String(variables.gameId)
+      ),
+    },
     playerJoined: {
-      subscribe: () => pubsub.subscribe('PLAYER_JOINED'),
+      subscribe: (_, __, { pubsub }) => pubsub.subscribe("PLAYER_JOINED"),
     },
-    moveMade: {
-      subscribe: (_, __, { pubsub }) => pubsub.subscribe('MOVE_MADE'),
-    },
-    selectionAdded: {
-      subscribe: () => pubsub.subscribe("SELECTION_ADDED"),
-    }
   },
 };
 

@@ -7,56 +7,32 @@ const betsTypeDefs = gql`
     players: [Player]
     games: [Game]
     game(id: ObjectId!): Game
-    getWheelSpinSelections: [Selection]
   }
 
   extend type Mutation {
-    joinGame(gameId: ObjectId!, name: String!): Game
-    createGame(name: String!): Game
-    makeMove(gameId: ObjectId!, move: String!): Game
-    addSelection(betAmount: Float!, totalPlayerRounds: Int!, currency: String!): AddSelectionResponse
-
+    createPlayer(walletAddress: ID!, username: String!): Player!
+    createGame(name: String!, type: String!, maxPlayers: Int!): Game!
+    joinGame(gameId: ID!, walletAddress: ID!): Game!
     saveWalletData(address: String!, balance: Float!, currency: String!): WalletResponse!
   }
 
   extend type Subscription {
+    gameUpdated(gameId: ID!): Game!
     playerJoined: Player
-    moveMade: Game
-    selectionAdded: Selection
   }
 
   type Player {
-    _id: ObjectId!
-    walletAddress: String!
-    score: Int!
-    gameId: ObjectId
-  }
+  walletAddress: ID!  # Using wallet address as unique ID
+  username: String!
+}
 
-  type Game {
-    _id: ObjectId!
-    players: [Player]
-    currentPlayer: Player
-    moves: [Move]
-    winner: Player
-  }
-
-  type Move {
-    playerId: ObjectId!
-    move: String!
-  }
-
-  type Selection {
-    _id: ObjectId!
-    betAmount: Float!
-    totalPlayerRounds: Int!
-    currency: String!
-  }
-
-  type AddSelectionResponse {
-    success: Boolean!
-    message: String!
-    selection: Selection
-  }
+type Game {
+  id: ID!
+  name: String!
+  type: String!
+  state: String!
+  players: [Player!]!
+}
 
   type WalletResponse {
     success: Boolean!
