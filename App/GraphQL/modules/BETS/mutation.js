@@ -1,5 +1,5 @@
 const { createPlayer } = require("./services/playerService");
-const { createGame, joinGame } = require("./services/gameService");
+const { createGame, enterGame, participateInGame } = require("./services/gameService");
 const { saveWalletData } = require("./services/walletService");
 
 const mutationResolver = {
@@ -8,12 +8,16 @@ const mutationResolver = {
             return await createPlayer(walletAddress, username);
         },
 
-        createGame: async (_, { name, type, maxPlayers }) => {
-            return await createGame(name, type, maxPlayers);
+        createGame: async (_, { name, type, maxPlayers, maxParticipants }) => {
+            return await createGame(name, type, maxPlayers, maxParticipants);
         },
 
-        joinGame: async (_, { gameId, walletAddress }, { pubsub }) => {
-            return await joinGame(gameId, walletAddress, pubsub);
+        enterGame: async (_, { gameId, walletAddress }, { pubsub }) => {
+            return await enterGame(gameId, walletAddress, pubsub);
+        },
+
+        participateInGame: async (_, { gameId, walletAddress }, { pubsub }) => {
+            return await participateInGame(gameId, walletAddress, pubsub);
         },
 
         saveWalletData: async (_, { address, balance, currency }) => {
@@ -21,6 +25,5 @@ const mutationResolver = {
         },
     },
 };
-
 
 module.exports = mutationResolver;
