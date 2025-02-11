@@ -7,14 +7,15 @@ const betsTypeDefs = gql`
     players: [Player]
     games: [Game]
     game(id: ObjectId!): Game
+    exchangeRates: ExchangeRates!
   }
 
   extend type Mutation {
-    createPlayer(walletAddress: ID!, username: String!): Player!
+    createPlayer(walletAddress: String!, username: String!): Player!
     createGame(name: String!, type: String!, maxPlayers: Int!, maxParticipants: Int!): Game!
 
-    enterGame(gameId: ID!, walletAddress: ID!): Game!  # Player enters the game
-    participateInGame(gameId: ID!, walletAddress: ID!): Game!  # Player actually joins (places a bet)
+    enterGame(gameId: ID!, walletAddress: String!): Game!  # Player enters the game
+    participateInGame(gameId: ID!, walletAddress: String!): Game!  # Player actually joins (places a bet)
 
     saveWalletData(address: String!, balance: Float!, currency: String!): WalletResponse!
   }
@@ -25,7 +26,7 @@ const betsTypeDefs = gql`
   }
 
   type Player {
-    walletAddress: ID!  # Using wallet address as unique ID
+    walletAddress: String!  # Using wallet address as unique ID
     username: String!
   }
 
@@ -41,6 +42,13 @@ const betsTypeDefs = gql`
 
     maxPlayers: Int!
     maxParticipants: Int!  # Limit for actual players who can bet
+  }
+
+  type ExchangeRates {
+    ETH: Float
+    BTC: Float
+    USDT: Float
+    BETS: Float
   }
 
   type WalletResponse {

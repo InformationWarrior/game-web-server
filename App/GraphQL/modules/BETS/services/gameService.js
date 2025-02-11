@@ -1,5 +1,8 @@
 const Game = require("../../../../models/game");
 const Player = require("../../../../models/player");
+const Bet = require("../../../../models/bet");
+const { getExchangeRates } = require("./exchangeRateService");
+
 const mongoose = require("mongoose");
 
 const getGames = async () => {

@@ -1,5 +1,6 @@
 const { getGames, getGameById } = require("./services/gameService");
 const { getPlayers } = require("./services/playerService");
+const { getExchangeRates } = require("./services/exchangeRateService");
 
 const queryResolver = {
     Query: {
@@ -14,7 +15,11 @@ const queryResolver = {
         players: async () => {
             return await getPlayers();
         },
-    },
+
+        exchangeRates: async () => {
+            return await getExchangeRates();
+        },
+    }
 };
 
 module.exports = queryResolver;
