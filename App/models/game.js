@@ -1,39 +1,44 @@
 const mongoose = require("mongoose");
 
 const gameSchema = new mongoose.Schema({
-  name: { type: String, required: true }, // Game name
-  type: { type: String, enum: ["single", "multiplayer"], required: true }, // Single or Multiplayer
+  name: { type: String, required: true },
+  type: { type: String, enum: ["single", "multiplayer"], required: true },
+  
+  enteredPlayers: [{ type: mongoose.Schema.Types.ObjectId, ref: "Player" }],
+  participants: [{ type: mongoose.Schema.Types.ObjectId, ref: "Player" }],
+  spectators: [{ type: mongoose.Schema.Types.ObjectId, ref: "Player" }],
 
-  enteredPlayers: [{ type: mongoose.Schema.Types.ObjectId, ref: "Player" }], // Players who enter the game
-  participants: [{ type: mongoose.Schema.Types.ObjectId, ref: "Player" }], // Players who actually bet & play
-  spectators: [{ type: mongoose.Schema.Types.ObjectId, ref: "Player" }], // Players who just watch
+  maxPlayers: { type: Number, default: 500 },
+  maxParticipants: { type: Number, default: 10 },
 
-  maxPlayers: { type: Number, default: 500 }, // Max total players (entered + participants)
-  maxParticipants: { type: Number, default: 10 }, // Max actual players who can bet & play
+  state: { type: String, enum: ["waiting", "in-progress", "completed"], default: "waiting" },
+  entryFee: { type: Number, default: 0 },
+  prizePool: { type: Number, default: 0 },
+  jackpot: { type: Number, default: 0 },
+  betOptions: [{ option: String, odds: Number }],  
+  totalBetsAmount: { type: Number, default: 0 }, // New: Track total bets
+  winningBetOption: { type: String, default: null }, // New: Store winning option
 
-  state: { type: String, enum: ["waiting", "in-progress", "completed"], default: "waiting" }, // Game state
-  entryFee: { type: Number, default: 0 }, // Required fee to join
-  prizePool: { type: Number, default: 0 }, // Total reward
-  jackpot: { type: Number, default: 0 }, // Bonus prize pool
-  betOptions: [{ option: String, odds: Number }], // Betting options and odds
-  duration: { type: Number, default: null }, // Duration in seconds
-  roundId: { type: String, unique: true }, // Unique game round identifier
-  result: { type: mongoose.Schema.Types.Mixed, default: null }, // Stores winner/result details
-  rules: { type: [String], default: [] }, // List of game rules
-  description: { type: String, default: "" }, // Game instructions
+  duration: { type: Number, default: null },
+  roundId: { type: String, unique: true },
+  expiresAt: { type: Date, default: null }, // New: Set expiry for auto-closing games
+  result: { type: mongoose.Schema.Types.Mixed, default: null },
+  rules: { type: [String], default: [] },
+  description: { type: String, default: "" },
 
   gameLogs: [
     {
-      action: { type: String, required: true }, // "Player Entered", "Bet Placed"
+      action: { type: String, required: true },
       player: { type: mongoose.Schema.Types.ObjectId, ref: "Player" },
       timestamp: { type: Date, default: Date.now }
     }
   ],
 
-  transactionHash: { type: String, default: null }, // Blockchain transaction for game payouts
-  currency: { type: String, enum: ["ETH", "BTC", "USDT", "BETS"], default: "ETH" }, // Multi-currency support
+  transactionHash: { type: String, default: null },
+  currency: { type: String, enum: ["ETH", "BTC", "USDT", "BETS"], default: "ETH" },
   createdAt: { type: Date, default: Date.now },
 });
+
 
 const Game = mongoose.model("Game", gameSchema);
 module.exports = Game;
