@@ -1,5 +1,5 @@
 const { apolloServer, pubsub } = require("./apolloServer");
-const setupSocketIO = require("./socketIO");
+
 const setupGraphQLWS = require("./graphqlWS");
 
 const startServers = async (httpServer) => {
@@ -9,7 +9,6 @@ const startServers = async (httpServer) => {
 
   console.log(`🚀 GraphQL API is available at http://localhost:5000${apolloServer.graphqlPath}`);
 
-  setupSocketIO(httpServer);
   setupGraphQLWS(httpServer, pubsub);
 };
 
