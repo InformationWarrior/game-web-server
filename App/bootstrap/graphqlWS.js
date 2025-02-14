@@ -1,23 +1,24 @@
-const { WebSocketServer } = require("ws");
-const { useServer } = require("graphql-ws/use/ws");
-const { schema, pubsub } = require("./apolloServer");
+const { WebSocketServer } = require('ws')
+const { SubscriptionServer } = require('subscriptions-transport-ws')
+const { execute, subscribe } = require('graphql')
+const schema = require('../GraphQL/schema')
 
-const setupGraphQLWS = (httpServer) => {
-    const wsServer = new WebSocketServer({
-        server: httpServer,
-        path: "/graphql",
-    });
+const createWebSocketServer = httpServer => {
+  const wsServer = new WebSocketServer({
+    server: httpServer,
+    path: '/graphql'
+  })
 
-    useServer(
-        {
-            schema,
-            context: () => ({ pubsub }),
-            onConnect: () => console.log("🔗 WebSocket Connected"),
-            onDisconnect: () => console.log("❌ WebSocket Disconnected"),
-        },
-        wsServer
-    );
-    console.log("✅ GraphQL WebSocket server is running...");
-};
+  return SubscriptionServer.create(
+    {
+      schema,
+      execute,
+      subscribe,
+      onConnect: () => console.log('🔗 WebSocket Connected'),
+      onDisconnect: () => console.log('❌ WebSocket Disconnected')
+    },
+    wsServer
+  )
+}
 
-module.exports = setupGraphQLWS;
+module.exports = { createWebSocketServer }

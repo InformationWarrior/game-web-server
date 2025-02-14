@@ -1,12 +1,26 @@
-const { ApolloServer } = require('apollo-server-express');
-const pubsub = require('../GraphQL/pubsub');
-const schema = require('../GraphQL/schema');
+const { ApolloServer } = require('@apollo/server')
+const {
+  ApolloServerPluginDrainHttpServer
+} = require('@apollo/server/plugin/drainHttpServer')
+const schema = require('../GraphQL/schema')
+const { createWebSocketServer } = require('./graphqlWs')
 
-const apolloServer = new ApolloServer({
+const createApolloServer = httpServer => {
+  return new ApolloServer({
     schema,
-    context: ({ req }) => ({
-        pubsub,
-    }),
-});
+    plugins: [
+      ApolloServerPluginDrainHttpServer({ httpServer }),
+      {
+        async serverWillStart () {
+          return {
+            async drainServer () {
+              createWebSocketServer(httpServer).close()
+            }
+          }
+        }
+      }
+    ]
+  })
+}
 
-module.exports = { apolloServer, schema, pubsub };
+module.exports = { createApolloServer }

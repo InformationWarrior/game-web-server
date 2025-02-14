@@ -1,15 +1,35 @@
-const { apolloServer, pubsub } = require("./apolloServer");
+require('dotenv').config()
+const { createServer } = require('http')
+const { createExpressApp } = require('./expressApp')
+const { createApolloServer } = require('./apolloServer')
+const { createWebSocketServer } = require('./graphqlWs')
+const startBackgroundTasks = require('../GraphQL/modules/WheelSpin/services/backgroundTasks')
+const PORT = process.env.PORT || 5000
 
-const setupGraphQLWS = require("./graphqlWS");
+const startServer = async () => {
+  const httpServer = createServer()
+  const apolloServer = createApolloServer(httpServer)
+  await apolloServer.start()
 
-const startServers = async (httpServer) => {
-  await apolloServer.start();
-  const expressApp = require("./expressApp");
-  apolloServer.applyMiddleware({ app: expressApp });
+  const app = createExpressApp(apolloServer)
 
-  console.log(`🚀 GraphQL API is available at http://localhost:5000${apolloServer.graphqlPath}`);
+  httpServer.on('request', app)
 
-  setupGraphQLWS(httpServer, pubsub);
-};
+  const subscriptionServer = createWebSocketServer(httpServer)
 
-module.exports = startServers;
+  httpServer.listen(PORT, () => {
+    console.log(
+      `🚀 GraphQL API is available at http://localhost:${PORT}/graphql`
+    )
+    console.log(`Server is running on http://localhost:${PORT}/graphql`)
+    startBackgroundTasks()
+  })
+
+  return {
+    apolloServer,
+    httpServer,
+    subscriptionServer
+  }
+}
+
+module.exports = startServer

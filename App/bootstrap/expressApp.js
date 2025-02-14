@@ -1,15 +1,19 @@
-const express = require('express');
-const cors = require('cors');
+const express = require('express')
+const bodyParser = require('body-parser')
+const cors = require('cors')
+const { expressMiddleware } = require('@apollo/server/express4')
 
-const expressApp = express();
-
-const corsOptions = {
-    origin: '*', // Allow all origins (change to specific domain in production)
+const createExpressApp = apolloServer => {
+  const app = express()
+  const corsOptions = {
+    origin: '*',
     credentials: true,
     methods: ['GET', 'POST']
-  };
+  }
+  app.use(cors(corsOptions))
+  app.use(bodyParser.json())
+  app.use('/graphql', expressMiddleware(apolloServer))
+  return app
+}
 
-expressApp.use(cors(corsOptions));
-expressApp.use(express.json());
-
-module.exports = expressApp;
+module.exports = { createExpressApp }
