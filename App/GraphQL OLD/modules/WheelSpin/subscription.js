@@ -10,3 +10,4 @@ const subscriptionResolvers = {
 }
 
 module.exports = subscriptionResolvers
+

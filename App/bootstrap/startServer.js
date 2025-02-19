@@ -3,7 +3,7 @@ const { createServer } = require('http')
 const { createExpressApp } = require('./expressApp')
 const { createApolloServer } = require('./apolloServer')
 const { createWebSocketServer } = require('./graphqlWs')
-const startBackgroundTasks = require('../GraphQL/modules/WheelSpin/services/backgroundTasks')
+const startBackgroundTasks = require("../GraphQL/Services/backgroundTasks");
 const PORT = process.env.PORT || 5000
 
 const startServer = async () => {

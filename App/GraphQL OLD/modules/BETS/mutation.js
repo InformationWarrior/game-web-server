@@ -31,4 +31,4 @@ const mutationResolver = {
   }
 }
 
-module.exports = mutationResolver
+module.exports = mutationResolver;

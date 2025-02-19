@@ -1,13 +1,56 @@
 const { mergeResolvers } = require('@graphql-tools/merge');
 
-const objectIdScalar = require('../scalars/objectIdScalar');
-const betsResolver = require('../modules/BETS/resolver')
-const wheelSpinResolver = require('../modules/WheelSpin/resolver');
+const objectIdScalar = require('../ObjectIdScalar');
+
+const betsQueries = require('./BETSProject/betsQueries');
+const betsMutations = require('./BETSProject/betsMutations');
+const betsSubscriptions = require('./BETSProject/betsSubscriptions');
 
 const resolvers = mergeResolvers([
     { ObjectId: objectIdScalar },
-    betsResolver,
-    wheelSpinResolver,
+
+    {
+        Query: {
+            ...betsQueries,
+
+        },
+        Mutation: {
+            ...betsMutations,
+
+        },
+        Subscription: {
+            ...betsSubscriptions,
+
+        },
+    },
 ]);
 
 module.exports = resolvers;
+
+
+
+
+// const { mergeResolvers } = require('@graphql-tools/merge');
+
+// const objectIdScalar = require('../ObjectIdScalar');
+
+// // const betsQueries = require('./BETSProject/betsQueries');
+// const betsMutations = require('./BETSProject/betsMutations');
+// // const betsSubscriptions = require('./BETSProject/betsSubscriptions');
+
+// // const wheelSpinQueries = require('./WheelSpin/wheelSpinQueries');
+// const wheelSpinMutations = require('./WheelSpin/wheelSpinMutations');
+// // const wheelSpinSubscriptions = require('./WheelSpin/wheelSpinSubscriptions');
+
+// const resolvers = mergeResolvers([
+//     // { ObjectId: objectIdScalar },
+
+//     {
+//         Mutation: {
+//             ...betsMutations,
+//             ...wheelSpinMutations
+//         },
+//     },
+// ]);
+
+// module.exports = resolvers;

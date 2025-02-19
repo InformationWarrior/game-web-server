@@ -11,9 +11,9 @@ const createApolloServer = httpServer => {
     plugins: [
       ApolloServerPluginDrainHttpServer({ httpServer }),
       {
-        async serverWillStart () {
+        async serverWillStart() {
           return {
-            async drainServer () {
+            async drainServer() {
               createWebSocketServer(httpServer).close()
             }
           }
