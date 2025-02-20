@@ -10,7 +10,7 @@ const betsMutations = {
     },
 
     enterGame: async (_, { gameId, walletAddress }) => {
-        return await enterGame(gameId, walletAddress);
+        return await enterGame(gameId, walletAddress, pubsub);
     },
 
     leaveGame: async (_, { gameId, walletAddress }) => {

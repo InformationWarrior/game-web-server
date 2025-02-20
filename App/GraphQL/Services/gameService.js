@@ -28,7 +28,7 @@ const createGame = async (name, type, maxPlayers, maxParticipants) => {
     return game;
 };
 
-const enterGame = async (gameId, walletAddress) => {
+const enterGame = async (gameId, walletAddress, pubsub) => {
     if (!mongoose.Types.ObjectId.isValid(gameId)) {
         throw new Error('Invalid game ID format');
     }
@@ -62,6 +62,20 @@ const enterGame = async (gameId, walletAddress) => {
         { enteredPlayers: game.enteredPlayers },
         { new: true }
     ).populate('enteredPlayers participants spectators');
+
+    // ✅ Publish player entered event for real-time updates
+    const playerEnteredPayload = {
+        playerEntered: {
+            gameId,
+            walletAddress: player.walletAddress, // Required for filtering
+            username: player.username,
+            profileImage: player.profileImage,
+            balance: player.balance,
+        },
+    };
+
+    console.log("📢 Publishing PLAYER_ENTERED:", playerEnteredPayload);
+    await pubsub.publish('PLAYER_ENTERED', playerEnteredPayload);
 
     return updatedGame;
 };
@@ -116,11 +130,6 @@ const leaveGame = async (gameId, walletAddress, pubsub) => {
     const updatedGame = await Game.findById(gameId).populate(
         'enteredPlayers participants spectators'
     );
-
-    // Publish game update if `pubsub` is provided
-    if (pubsub) {
-        pubsub.publish('GAME_UPDATED', { gameUpdated: updatedGame });
-    }
 
     return updatedGame;
 };

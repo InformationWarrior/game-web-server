@@ -32,12 +32,12 @@ const betsSubscriptions = {
         ),
     },
 
-    // betPlaced: {
-    //     subscribe: withFilter(
-    //         () => pubsub.asyncIterator("BET_PLACED"),
-    //         (payload, variables) => payload.betPlaced.gameId === variables.gameId
-    //     ),
-    // },
+    betPlaced: {
+        subscribe: withFilter(
+            () => pubsub.asyncIterator("BET_PLACED"),
+            (payload, variables) => payload.betPlaced.gameId === variables.gameId
+        ),
+    },
 
 };
 
