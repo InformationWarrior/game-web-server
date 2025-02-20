@@ -1,5 +1,6 @@
 const Game = require("../../models/game");
 const Player = require("../../models/player");
+const Bet = require("../../models/bet");
 const mongoose = require("mongoose");
 
 const placeBet = async (gameId, walletAddress, amount, currency, totalPlayerRounds, pubsub) => {
@@ -7,7 +8,7 @@ const placeBet = async (gameId, walletAddress, amount, currency, totalPlayerRoun
         throw new Error("Invalid game ID format");
     }
 
-    const game = await Game.findById(gameId);
+    const game = await Game.findById(gameId).populate("participants"); // ✅ Populate participants
     if (!game) {
         throw new Error("Game not found");
     }
@@ -18,73 +19,57 @@ const placeBet = async (gameId, walletAddress, amount, currency, totalPlayerRoun
     }
 
     // Check if player is already a participant
-    const isParticipant = game.participants.some(p => p.toString() === player._id.toString());
+    const isParticipant = game.participants.some(p => p && p._id.toString() === player._id.toString());
     if (!isParticipant) {
         throw new Error("Player must participate in the game before placing a bet.");
     }
 
-    // Validate amount and totalPlayerRounds
-    if (amount <= 0) {
-        throw new Error("Bet amount must be greater than zero.");
-    }
-
-    if (totalPlayerRounds <= 0) {
-        throw new Error("Total player rounds must be greater than zero.");
-    }
-
     // Deduct balance from player
-    if (player.balance < amount) {
-        throw new Error("Insufficient balance to place the bet.");
-    }
     player.balance -= amount;
+    player.totalBetAmount += amount;
     await player.save();
 
-    // Store bet in game object
-    game.bets.push({
-        walletAddress,
+    // Create and save the bet
+    const bet = new Bet({
+        player: player._id,
+        game: game._id,
         amount,
         currency,
-        totalPlayerRounds,
+        usdEquivalent: amount * 1.2,
+        betOption: "someOption",
+        exchangeRate: 1.2,
     });
 
+    await bet.save();
+
+    // Update game total bet amount
+    game.totalBetsAmount += amount;
     await game.save();
 
-    // Fetch the updated game
-    const updatedGame = await Game.findById(gameId).populate("participants");
+    // **Re-populate participants before returning the game**
+    const updatedGame = await Game.findById(gameId).populate("participants"); // ✅ Re-populate
 
-    // Publish bet event (if needed)
-    // if (pubsub) {
-    //     pubsub.publish("BET_PLACED", {
-    //         betPlaced: {
-    //             gameId,
-    //             walletAddress,
-    //             amount,
-    //             currency,
-    //             totalPlayerRounds,
-    //             game: updatedGame
-    //         }
-    //     });
-
-    //     // ✅ Also publish `PLAYER_PARTICIPATED`
-    //     console.log(`📢 Publishing PLAYER_PARTICIPATED for ${walletAddress} in game ${gameId}`);
-    //     pubsub.publish("PLAYER_PARTICIPATED", {
-    //         playerParticipated: {
-    //             gameId,
-    //             walletAddress,
-    //             game: updatedGame
-    //         }
-    //     });
-    // }
-
-
+    // Publish bet event
+    if (pubsub) {
+        pubsub.publish("BET_PLACED", {
+            betPlaced: {
+                gameId: game._id.toString(),
+                walletAddress,
+                amount,
+                currency,
+                totalPlayerRounds,
+                game: updatedGame // ✅ Return populated game
+            }
+        });
+    }
 
     return {
-        gameId,
+        gameId: game._id.toString(),
         walletAddress,
-        amount,
-        currency,
+        amount: bet.amount,
+        currency: bet.currency,
         totalPlayerRounds,
-        game: updatedGame
+        game: updatedGame // ✅ Ensure participants are fully populated
     };
 };
 

@@ -3,7 +3,7 @@ const mongoose = require("mongoose");
 const gameSchema = new mongoose.Schema({
   name: { type: String, required: true },
   type: { type: String, enum: ["single", "multiplayer"], required: true },
-  
+
   enteredPlayers: [{ type: mongoose.Schema.Types.ObjectId, ref: "Player" }],
   participants: [{ type: mongoose.Schema.Types.ObjectId, ref: "Player" }],
   spectators: [{ type: mongoose.Schema.Types.ObjectId, ref: "Player" }],
@@ -15,9 +15,8 @@ const gameSchema = new mongoose.Schema({
   entryFee: { type: Number, default: 0 },
   prizePool: { type: Number, default: 0 },
   jackpot: { type: Number, default: 0 },
-  betOptions: [{ option: String, odds: Number }],  
+  betOptions: [{ option: String, odds: Number }],
   totalBetsAmount: { type: Number, default: 0 }, // New: Track total bets
-  winningBetOption: { type: String, default: null }, // New: Store winning option
 
   duration: { type: Number, default: null },
   roundId: { type: String, unique: true },
@@ -37,6 +36,17 @@ const gameSchema = new mongoose.Schema({
   transactionHash: { type: String, default: null },
   currency: { type: String, enum: ["ETH", "BTC", "USDT", "BETS"], default: "ETH" },
   createdAt: { type: Date, default: Date.now },
+
+  rounds: [
+    {
+      roundNumber: { type: Number, required: true },
+      winner: { type: mongoose.Schema.Types.ObjectId, ref: "Player" },
+      winningBetOption: { type: String, required: true },
+      bets: [{ type: mongoose.Schema.Types.ObjectId, ref: "Bet" }],
+      prizeDistributed: { type: Boolean, default: false },
+      endedAt: { type: Date, default: Date.now }
+    }
+  ]
 });
 
 
