@@ -56,6 +56,7 @@ const betsTypeDefs = gql`
     spectators: [Player!]! # Players who are only watching
     maxPlayers: Int!
     maxParticipants: Int! # Limit for actual players who can bet
+    totalBetsAmount: Float!  # ✅ Ensure this field is defined
   }
 
   type Player {

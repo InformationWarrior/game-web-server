@@ -1,5 +1,6 @@
 const pubsub = require('../pubsub')
 const { removeParticipants } = require("./gameService");
+const GAME_ID = process.env.GAME_ID;
 
 // Define your game states with a duration (full time) for each
 const GAME_STATES = {
@@ -31,7 +32,7 @@ const updateState = async () => {
     // When the countdown reaches 0, transition to the next state
     switch (currentGameState.gameState) {
       case 'RESET':
-        await removeParticipants("67b42091dad8e320e611a165"); // Replace with actual gameId
+        await removeParticipants(GAME_ID); // Replace with actual gameId
 
         currentGameState = {
           ...GAME_STATES.BETTING,

@@ -51,6 +51,15 @@ const placeBet = async (gameId, walletAddress, amount, currency, totalPlayerRoun
 
     // Publish bet event
     if (pubsub) {
+        console.log("📢 Publishing BET_PLACED event:", {
+            gameId: game._id.toString(),
+            walletAddress,
+            amount,
+            currency,
+            totalPlayerRounds,
+            game: updatedGame,
+        });
+
         pubsub.publish("BET_PLACED", {
             betPlaced: {
                 gameId: game._id.toString(),

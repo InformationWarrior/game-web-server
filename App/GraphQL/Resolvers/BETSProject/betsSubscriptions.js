@@ -35,7 +35,11 @@ const betsSubscriptions = {
     betPlaced: {
         subscribe: withFilter(
             () => pubsub.asyncIterator("BET_PLACED"),
-            (payload, variables) => payload.betPlaced.gameId === variables.gameId
+            (payload, variables) => {
+                console.log("🔍 Filtering subscription for:", variables);
+                return payload.betPlaced.gameId === variables.gameId &&
+                    payload.betPlaced.walletAddress === variables.walletAddress;
+            }
         ),
     },
 
