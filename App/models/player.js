@@ -7,8 +7,8 @@ const playerSchema = new mongoose.Schema({
   balance: { type: Number, default: 0 },
   totalWins: { type: Number, default: 0 },
   totalLosses: { type: Number, default: 0 },
-  totalBetAmount: { type: Number, default: 0 }, // New: Track total bet amount
-  lastActiveAt: { type: Date, default: Date.now }, // New: Track last active time
+  totalBetAmount: { type: Number, default: 0 },
+  lastActiveAt: { type: Date, default: Date.now },
   gamesPlayed: [{ type: mongoose.Schema.Types.ObjectId, ref: "Game" }],
   rank: { type: String, enum: ["bronze", "silver", "gold", "platinum"], default: "bronze" },
   referrer: { type: mongoose.Schema.Types.ObjectId, ref: "Player", default: null },
@@ -25,6 +25,23 @@ const playerSchema = new mongoose.Schema({
   ],
   sessionToken: { type: String, default: null },
   createdAt: { type: Date, default: Date.now },
+
+  // 🔹 NEW ADDITIONS FOR FUTURE-PROOFING
+  highestWin: { type: Number, default: 0 },
+  longestWinStreak: { type: Number, default: 0 },
+  averageBetAmount: { type: Number, default: 0 },
+  achievements: [
+    {
+      title: String,
+      description: String,
+      earnedAt: { type: Date, default: Date.now }
+    }
+  ],
+  preferences: {
+    sound: { type: Boolean, default: true },
+    notifications: { type: Boolean, default: true },
+    darkMode: { type: Boolean, default: false }
+  }
 });
 
 const Player = mongoose.model("Player", playerSchema);
