@@ -42,7 +42,6 @@ const betsSubscriptions = {
             }
         ),
     },
-
 };
 
 module.exports = betsSubscriptions;

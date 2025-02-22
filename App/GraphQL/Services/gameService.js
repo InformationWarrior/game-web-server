@@ -1,6 +1,7 @@
 const mongoose = require('mongoose');
 const Game = require("../../models/game");
 const Player = require("../../models/player");
+const Bet = require("../../models/bet");
 
 const createGame = async (name, type, maxPlayers, maxParticipants) => {
     const normalizedType = type.toLowerCase();
@@ -78,23 +79,6 @@ const enterGame = async (gameId, walletAddress, pubsub) => {
     await pubsub.publish('PLAYER_ENTERED', playerEnteredPayload);
 
     return updatedGame;
-};
-
-const removeParticipants = async (gameId) => {
-    try {
-        const game = await Game.findById(gameId);
-        if (!game) {
-            throw new Error("Game not found");
-        }
-
-        game.participants = [];
-        await game.save();
-
-        return { participants: [] };
-    } catch (error) {
-        console.error("❌ Error removing participated players:", error.message);
-        throw new Error("Failed to remove participated players");
-    }
 };
 
 const leaveGame = async (gameId, walletAddress, pubsub) => {
@@ -188,6 +172,34 @@ const participateInGame = async (gameId, walletAddress, pubsub) => {
 
     return updatedGame;
 };
+
+const removeParticipants = async (gameId) => {
+    try {
+        const game = await Game.findById(gameId);
+        if (!game) {
+            throw new Error("Game not found");
+        }
+
+        // ✅ Clear all participants
+        game.participants = [];
+
+        // ✅ Clear all bets for this game
+        await Bet.deleteMany({ game: gameId });
+
+        // ✅ Reset totalBetsAmount in the game
+        game.totalBetsAmount = 0;
+
+        await game.save();
+
+        console.log(`✅ Participants and bets removed for game: ${gameId}`);
+
+        return { participants: [], totalBetsAmount: 0 };
+    } catch (error) {
+        console.error("❌ Error removing participants and bets:", error.message);
+        throw new Error("Failed to remove participants and bets");
+    }
+};
+
 
 const getEnteredPlayers = async (gameId) => {
     if (!mongoose.Types.ObjectId.isValid(gameId)) {
