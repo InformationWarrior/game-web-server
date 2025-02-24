@@ -14,5 +14,8 @@ const transactionSchema = new mongoose.Schema({
     timestamp: { type: Date, default: Date.now }
 });
 
+// ✅ Index for faster searches
+transactionSchema.index({ player: 1, timestamp: -1 });
+
 const Transaction = mongoose.model("Transaction", transactionSchema);
 module.exports = Transaction;

@@ -3,8 +3,9 @@ const { gql } = require('apollo-server-express');
 const betsTypeDefs = gql`
   extend type Query {
     getEnteredPlayers(gameId: ID!): [Player!]!
-    getParticipants(gameId: ID!): [Player!]!
-    getWallet(walletAddress: String!): Wallet!
+    getParticipants(gameId: ID!): [ParticipantPayload!]!
+    getBets(gameId: ID!): [Bet!]!
+    getAllGames: [Game!]! # Added query to get all games list
   }
 
   extend type Mutation {
@@ -27,17 +28,24 @@ const betsTypeDefs = gql`
       currency: String!
     ): CreatePlayerResponse!
 
-    participateInGame(gameId: ID!, walletAddress: String!): Game!
-    removeParticipants(gameId: ID!): Game!
-    placeBet(gameId: ID!, walletAddress: String!, amount: Float!, currency: String!, totalPlayerRounds: Int!): Bet!
+    placeBetAndParticipate(gameId: ID!, walletAddress: String!, betAmount: Float!, currency: String!): ParticipantPayload!
+    removeParticipants(gameId: ID!): Boolean!
+    removeBets(gameId: ID!): Boolean!
   }
 
   extend type Subscription {
-    playerParticipated(gameId: ID!, walletAddress: String!): PlayerParticipatedPayload!
     playerEntered(gameId: ID!, walletAddress: String!): PlayerEnteredPayload!
-    betPlaced(gameId: ID!, walletAddress: String!): Bet!
+    playerParticipated(gameId: ID!): ParticipantPayload!
+    betPlaced(gameId: ID!): Bet!
     gameStatusUpdated: GameStatus!
   }
+
+  type ParticipantPayload {
+  walletAddress: String!
+  username: String!
+  betAmount: Float!
+  currency: String!
+}
 
   # Response Type for createPlayer
   type CreatePlayerResponse {
@@ -47,7 +55,7 @@ const betsTypeDefs = gql`
   }
 
   type Game {
-    id: ID!
+    _id: ID!
     name: String!
     type: String!
     state: String!
@@ -72,30 +80,24 @@ const betsTypeDefs = gql`
     referralCount: Int!
   }
 
-  type Wallet {
-    walletAddress: String!
-    balance: Float!
-    currency: String!
-  }
-
-  type PlayerParticipatedPayload {
-    gameId: ID!
-    walletAddress: String!
-    game: Game!
-  }
-    
+  type Bet {
+  id: ID!
+  player: Player!
+  game: ID!
+  amount: Float!
+  currency: String!
+  usdEquivalent: Float!
+  betOption: String!
+  exchangeRate: Float!
+  transactionHash: String
+  timestamp: String!
+  multiBet: Boolean!
+  strategy: String!
+}
+  
   type PlayerEnteredPayload {
     gameId: ID!
     walletAddress: String!
-    game: Game!
-  }
-
-  type Bet {
-    gameId: ID!
-    walletAddress: String!
-    amount: Float!
-    currency: String!
-    totalPlayerRounds: Int!
     game: Game!
   }
 

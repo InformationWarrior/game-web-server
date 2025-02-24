@@ -1,7 +1,6 @@
-const { createGame, enterGame, leaveGame } = require("../../Services/gameService");
+const { createGame, enterGame, leaveGame, removeParticipants, removeBets } = require("../../Services/gameService");
 const { createPlayer } = require('../../Services/gameService');
-const { participateInGame, removeParticipants } = require("../../Services/gameService");
-const { placeBet } = require("../../Services/placeBetService");
+const { placeBetAndParticipate } = require("../../Services/placeBetAndParticipate");
 const pubsub = require("../../pubsub");
 
 const betsMutations = {
@@ -21,16 +20,16 @@ const betsMutations = {
         return await createPlayer(walletAddress, username, balance, currency);
     },
 
-    participateInGame: async (_, { gameId, walletAddress }) => {
-        return await participateInGame(gameId, walletAddress, pubsub);
-    },
-
     removeParticipants: async (_, { gameId }) => {
-        return await removeParticipants(gameId);
+        return await removeParticipants(gameId, pubsub);
     },
 
-    placeBet: async (_, { gameId, walletAddress, amount, currency, totalPlayerRounds }) => {
-        return await placeBet(gameId, walletAddress, amount, currency, totalPlayerRounds, pubsub);
+    removeBets: async (_, { gameId }) => {
+        return await removeBets(gameId, pubsub);
+    },
+
+    placeBetAndParticipate: async (_, { gameId, walletAddress, betAmount, currency }) => {
+        return await placeBetAndParticipate(gameId, walletAddress, betAmount, currency, pubsub);
     }
 };
 

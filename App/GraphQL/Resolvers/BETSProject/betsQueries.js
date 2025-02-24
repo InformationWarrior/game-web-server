@@ -1,5 +1,4 @@
-const { getEnteredPlayers } = require("../../Services/gameService");
-const { getParticipants } = require("../../Services/gameService");
+const { getEnteredPlayers, getParticipants, getBets, getAllGames } = require("../../Services/gameService");
 
 const betsQueries = {
     getEnteredPlayers: async (_, { gameId }) => {
@@ -8,6 +7,12 @@ const betsQueries = {
     getParticipants: async (_, { gameId }) => {
         return await getParticipants(gameId);
     },
+    getBets: async (_, { gameId }) => {
+        return await getBets(gameId);
+    },
+    getAllGames: async () => {
+        return await getAllGames()
+    }
 };
 
 module.exports = betsQueries;

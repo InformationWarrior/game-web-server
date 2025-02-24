@@ -1,11 +1,12 @@
-const pubsub = require('../pubsub')
+const pubsub = require('../pubsub');
+const { removeBets } = require('./gameService');
 const { removeParticipants } = require("./gameService");
 const GAME_ID = process.env.GAME_ID;
 
 // Define your game states with a duration (full time) for each
 const GAME_STATES = {
   RESET: { gameState: 'RESET', duration: 5 },
-  BETTING: { gameState: 'BETTING', duration: 7 },
+  BETTING: { gameState: 'BETTING', duration: 30 },
   RUNNING: { gameState: 'RUNNING', duration: 3 },
   END: { gameState: 'END', duration: 3 }
 }
@@ -33,6 +34,7 @@ const updateState = async () => {
     switch (currentGameState.gameState) {
       case 'RESET':
         await removeParticipants(GAME_ID); // Replace with actual gameId
+        await removeBets(GAME_ID);
 
         currentGameState = {
           ...GAME_STATES.BETTING,

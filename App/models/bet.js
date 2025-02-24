@@ -15,5 +15,8 @@ const betSchema = new mongoose.Schema({
     autoBetSettings: { type: mongoose.Schema.Types.Mixed, default: {} }
 });
 
+// ✅ Index for faster queries
+betSchema.index({ game: 1, player: 1 });
+
 const Bet = mongoose.model("Bet", betSchema);
 module.exports = Bet;

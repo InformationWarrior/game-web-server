@@ -173,33 +173,44 @@ const participateInGame = async (gameId, walletAddress, pubsub) => {
     return updatedGame;
 };
 
-const removeParticipants = async (gameId) => {
+const removeParticipants = async (gameId, pubsub) => {
     try {
         const game = await Game.findById(gameId);
-        if (!game) {
-            throw new Error("Game not found");
-        }
+        if (!game) throw new Error("Game not found");
 
-        // ✅ Clear all participants
+        // Clear participants array
         game.participants = [];
-
-        // ✅ Clear all bets for this game
-        await Bet.deleteMany({ game: gameId });
-
-        // ✅ Reset totalBetsAmount in the game
-        game.totalBetsAmount = 0;
-
         await game.save();
 
-        console.log(`✅ Participants and bets removed for game: ${gameId}`);
+        // Publish subscription event with empty participants
+        if (pubsub) {
+            pubsub.publish("PLAYER_PARTICIPATED", { playerParticipated: [] });
+        }
 
-        return { participants: [], totalBetsAmount: 0 };
+        return true;
     } catch (error) {
-        console.error("❌ Error removing participants and bets:", error.message);
-        throw new Error("Failed to remove participants and bets");
+        throw new Error(error.message);
     }
 };
 
+const removeBets = async (gameId, pubsub) => {
+    try {
+        // Remove all bets for the game
+        const deletedBets = await Bet.deleteMany({ game: gameId });
+
+        // Reset total bet amount
+        await Game.findByIdAndUpdate(gameId, { totalBetsAmount: 0 });
+
+        // Publish event to notify clients
+        if (pubsub) {
+            pubsub.publish("BET_PLACED", { betPlaced: [] });
+        }
+
+        return deletedBets.deletedCount > 0;
+    } catch (error) {
+        throw new Error(error.message);
+    }
+};
 
 const getEnteredPlayers = async (gameId) => {
     if (!mongoose.Types.ObjectId.isValid(gameId)) {
@@ -219,16 +230,59 @@ const getEnteredPlayers = async (gameId) => {
 
 
 const getParticipants = async (gameId) => {
-    if (!mongoose.Types.ObjectId.isValid(gameId)) {
-        throw new Error("Invalid game ID format");
-    }
+    try {
+        if (!mongoose.Types.ObjectId.isValid(gameId)) {
+            throw new Error("Invalid game ID format");
+        }
 
-    const game = await Game.findById(gameId).populate("participants");
-    if (!game) {
-        throw new Error("Game not found");
-    }
+        const game = await Game.findById(gameId)
+            .populate({
+                path: "participants",
+                select: "walletAddress username",
+                populate: { path: "bets", match: { game: gameId }, select: "amount" }
+            });
+        if (!game) throw new Error("Game not found");
 
-    return game.participants;
+        // Fetch bets for participants to include betAmount
+        const bets = await Bet.find({ game: gameId }).select("player amount");
+        const betMap = new Map(bets.map(bet => [bet.player.toString(), bet.amount]));
+
+        return game.participants.map((participant) => ({
+            walletAddress: participant.walletAddress,
+            username: participant.username,
+            betAmount: betMap.get(participant._id.toString()) || 0,
+        }));
+    } catch (error) {
+        throw new Error(error.message);
+    }
+};
+
+
+const getBets = async (gameId) => {
+    try {
+        // Find all bets for the game and return only required fields
+        const bets = await Bet.find({ game: gameId }).populate("player", "walletAddress username");
+
+        return bets.map((bet) => ({
+            id: bet.id,
+            game: bet.game,
+            player: bet.player ? {
+                walletAddress: bet.player.walletAddress || "Unknown",
+                username: bet.player.username || "Unknown"
+            } : { walletAddress: "Unknown", username: "Unknown" },
+            amount: bet.amount,
+            currency: bet.currency,
+            betOption: bet.betOption,
+            usdEquivalent: bet.usdEquivalent,
+            exchangeRate: bet.exchangeRate,
+            transactionHash: bet.transactionHash,
+            timestamp: bet.timestamp,
+            multiBet: bet.multiBet,
+            strategy: bet.strategy,
+        }));
+    } catch (error) {
+        throw new Error(error.message);
+    }
 };
 
 const createPlayer = async (walletAddress, username, balance, currency) => {
@@ -278,6 +332,15 @@ const createPlayer = async (walletAddress, username, balance, currency) => {
     }
 };
 
+const getAllGames = async () => {
+    try {
+        const games = await Game.find()
+        return games
+    } catch (error) {
+        throw new Error('Error fetching games')
+    }
+}
+
 module.exports = {
     createGame,
     createPlayer,
@@ -285,6 +348,9 @@ module.exports = {
     leaveGame,
     participateInGame,
     removeParticipants,
+    removeBets,
     getEnteredPlayers,
     getParticipants,
+    getBets,
+    getAllGames,
 };

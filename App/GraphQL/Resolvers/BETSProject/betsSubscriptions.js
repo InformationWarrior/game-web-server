@@ -7,16 +7,7 @@ const betsSubscriptions = {
     },
 
     playerParticipated: {
-        subscribe: withFilter(
-            () => pubsub.asyncIterator('PLAYER_PARTICIPATED'),
-            (payload, variables) => {
-                console.log("📢 Publishing PLAYER_PARTICIPATED:", payload); // ✅ Check logs
-                return (
-                    payload.playerParticipated.gameId === variables.gameId &&
-                    payload.playerParticipated.walletAddress === variables.walletAddress
-                );
-            }
-        ),
+        subscribe: () => pubsub.asyncIterator(["PLAYER_PARTICIPATED"]),
     },
 
     playerEntered: {
@@ -36,9 +27,10 @@ const betsSubscriptions = {
         subscribe: withFilter(
             () => pubsub.asyncIterator("BET_PLACED"),
             (payload, variables) => {
-                console.log("🔍 Filtering subscription for:", variables);
-                return payload.betPlaced.gameId === variables.gameId &&
-                    payload.betPlaced.walletAddress === variables.walletAddress;
+                return (
+                    payload.betPlaced.game === variables.gameId &&
+                    payload.betPlaced.player.walletAddress === variables.walletAddress
+                );
             }
         ),
     },
