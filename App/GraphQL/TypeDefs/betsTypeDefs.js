@@ -6,6 +6,7 @@ const betsTypeDefs = gql`
     getParticipants(gameId: ID!): [ParticipantPayload!]!
     getBets(gameId: ID!): [Bet!]!
     getAllGames: [Game!]! # Added query to get all games list
+    getBetHistoryByWallet(walletAddress: String!): [BetHistory]!
   }
 
   extend type Mutation {
@@ -39,6 +40,12 @@ const betsTypeDefs = gql`
     betPlaced(gameId: ID!): Bet!
     gameStatusUpdated: GameStatus!
   }
+
+  type BetHistory {
+  amount: Float!
+  username: String!
+  winAmount: Float!
+}
 
   type ParticipantPayload {
   walletAddress: String!

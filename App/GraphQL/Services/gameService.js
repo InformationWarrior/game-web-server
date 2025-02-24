@@ -5,199 +5,6 @@ const Bet = require("../../models/bet");
 const BetHistory = require("../../models/betHistory");
 const Round = require("../../models/round");
 
-// const createGame = async (name, type, maxPlayers, maxParticipants) => {
-//     const normalizedType = type.toLowerCase();
-
-//     if (!['single', 'multiplayer'].includes(normalizedType)) {
-//         throw new Error('Invalid game type. Allowed values: single, multiplayer.');
-//     }
-
-//     if (maxParticipants > maxPlayers) {
-//         throw new Error('maxParticipants cannot be greater than maxPlayers.');
-//     }
-
-//     // ✅ First, create the round
-//     const firstRound = new Round({
-//         participants: [],
-//         bets: [],
-//         winner: null,
-//         roundNumber: 1
-//     });
-
-//     await firstRound.save();
-
-//     // ✅ Create the game but don't save it yet
-//     const game = new Game({
-//         name,
-//         type: normalizedType,
-//         maxPlayers,
-//         maxParticipants,
-//         state: 'waiting',
-//         enteredPlayers: [],
-//         participants: [],
-//         spectators: [],
-//         rounds: [firstRound._id], // ✅ Store first round
-//         totalRounds: 1, // We will create the first round immediately
-//         latestRound: firstRound._id // ✅ No more null issue
-//     });
-
-//     // ✅ Create the first round
-//     // const firstRound = new Round({
-//     //     game: game._id, // Link the round to this game
-//     //     participants: [],
-//     //     bets: [],
-//     //     winner: null,
-//     //     roundNumber: 1
-//     // });
-
-//     // await firstRound.save();
-
-//     // ✅ Now set the `latestRound` and `rounds` before saving the game
-//     // game.latestRound = firstRound._id;
-//     // game.rounds.push(firstRound._id);
-
-//     await game.save(); // ✅ Save the game only once
-
-//     return game;
-// };
-
-
-// const createGame = async (name, type, maxPlayers, maxParticipants) => {
-//     const normalizedType = type.toLowerCase();
-
-//     if (!['single', 'multiplayer'].includes(normalizedType)) {
-//         throw new Error('Invalid game type. Allowed values: single, multiplayer.');
-//     }
-
-//     if (maxParticipants > maxPlayers) {
-//         throw new Error('maxParticipants cannot be greater than maxPlayers.');
-//     }
-
-//     // ✅ First, create the round
-//     const firstRound = new Round({
-//         participants: [],
-//         bets: [],
-//         winner: null,
-//         roundNumber: 1
-//     });
-
-//     await firstRound.save();
-
-//     // ✅ Then, create the game with latestRound set
-//     const game = new Game({
-//         name,
-//         type: normalizedType,
-//         maxPlayers,
-//         maxParticipants,
-//         state: 'waiting',
-//         enteredPlayers: [],
-//         participants: [],
-//         spectators: [],
-//         rounds: [firstRound._id], // ✅ Store first round
-//         totalRounds: 100000000,
-//         latestRound: firstRound._id // ✅ No more null issue
-//     });
-
-//     await game.save();
-//     return game;
-// };
-
-// const createGame = async (name, type, maxPlayers, maxParticipants) => {
-//     const normalizedType = type.toLowerCase();
-
-//     if (!['single', 'multiplayer'].includes(normalizedType)) {
-//         throw new Error('Invalid game type. Allowed values: single, multiplayer.');
-//     }
-
-//     if (maxParticipants > maxPlayers) {
-//         throw new Error('maxParticipants cannot be greater than maxPlayers.');
-//     }
-
-//     // ✅ Step 1: Create Game (without latestRound)
-//     const game = new Game({
-//         name,
-//         type: normalizedType,
-//         maxPlayers,
-//         maxParticipants,
-//         state: 'waiting',
-//         enteredPlayers: [],
-//         participants: [],
-//         spectators: [],
-//         rounds: [],
-//         totalRounds: 0, 
-//         latestRound: null // Will be updated after round creation
-//     });
-
-//     await game.save();
-
-//     // ✅ Step 2: Create the First Round with `game._id`
-//     const firstRound = new Round({
-//         game: game._id, // ✅ Assign game ID here
-//         participants: [],
-//         bets: [],
-//         winner: null,
-//         roundNumber: 1
-//     });
-
-//     await firstRound.save();
-
-//     // ✅ Step 3: Update Game with latestRound and totalRounds
-//     game.latestRound = firstRound._id;
-//     game.totalRounds = 1;
-//     game.rounds.push(firstRound._id);
-
-//     await game.save();
-
-//     return game;
-// };
-
-// const createGame = async (name, type, maxPlayers, maxParticipants) => {
-//     const normalizedType = type.toLowerCase();
-
-//     if (!['single', 'multiplayer'].includes(normalizedType)) {
-//         throw new Error('Invalid game type. Allowed values: single, multiplayer.');
-//     }
-
-//     if (maxParticipants > maxPlayers) {
-//         throw new Error('maxParticipants cannot be greater than maxPlayers.');
-//     }
-
-//     // ✅ Step 1: Create the Game without saving it
-//     const game = new Game({
-//         name,
-//         type: normalizedType,
-//         maxPlayers,
-//         maxParticipants,
-//         state: 'waiting',
-//         enteredPlayers: [],
-//         participants: [],
-//         spectators: [],
-//         rounds: [],
-//         totalRounds: 0 // ✅ No need to set latestRound to null explicitly
-//     });
-
-//     // ✅ Step 2: Create the First Round
-//     const firstRound = new Round({
-//         game: game._id, // ✅ Assign game ID here
-//         participants: [],
-//         bets: [],
-//         winner: null,
-//         roundNumber: 1
-//     });
-
-//     await firstRound.save();
-
-//     // ✅ Step 3: Assign latestRound and save the Game
-//     game.latestRound = firstRound._id;
-//     game.totalRounds = 1;
-//     game.rounds.push(firstRound._id);
-
-//     await game.save();
-
-//     return game;
-// };
-
-
 const createGame = async (name, type, maxPlayers, maxParticipants) => {
     const normalizedType = type.toLowerCase();
 
@@ -249,6 +56,58 @@ const createGame = async (name, type, maxPlayers, maxParticipants) => {
 };
 
 
+// const enterGame = async (gameId, walletAddress, pubsub) => {
+//     if (!mongoose.Types.ObjectId.isValid(gameId)) {
+//         throw new Error('Invalid game ID format');
+//     }
+
+//     const game = await Game.findById(gameId);
+//     if (!game) {
+//         throw new Error('Game not found');
+//     }
+
+//     const player = await Player.findOne({ walletAddress });
+//     if (!player) {
+//         throw new Error('Player not found');
+//     }
+
+//     // Check if player is already in enteredPlayers
+//     const isAlreadyEntered = game.enteredPlayers.some((p) => p.toString() === player._id.toString());
+//     if (isAlreadyEntered) {
+//         throw new Error('Player has already entered this game.');
+//     }
+
+//     // Ensure max players limit is not exceeded
+//     if (game.enteredPlayers.length >= game.maxPlayers) {
+//         throw new Error('Game is full. No more players can enter.');
+//     }
+
+//     // Add player to enteredPlayers and update the game
+//     game.enteredPlayers.push(player._id);
+
+//     const updatedGame = await Game.findByIdAndUpdate(
+//         gameId,
+//         { enteredPlayers: game.enteredPlayers },
+//         { new: true }
+//     ).populate('enteredPlayers participants spectators');
+
+//     // ✅ Publish player entered event for real-time updates
+//     const playerEnteredPayload = {
+//         playerEntered: {
+//             gameId,
+//             walletAddress: player.walletAddress, // Required for filtering
+//             username: player.username,
+//             profileImage: player.profileImage,
+//             balance: player.balance,
+//         },
+//     };
+
+//     console.log("📢 Publishing PLAYER_ENTERED:", playerEnteredPayload);
+//     await pubsub.publish('PLAYER_ENTERED', playerEnteredPayload);
+
+//     return updatedGame;
+// };
+
 const enterGame = async (gameId, walletAddress, pubsub) => {
     if (!mongoose.Types.ObjectId.isValid(gameId)) {
         throw new Error('Invalid game ID format');
@@ -264,42 +123,42 @@ const enterGame = async (gameId, walletAddress, pubsub) => {
         throw new Error('Player not found');
     }
 
-    // Check if player is already in enteredPlayers
+    // ✅ Check if player is already in enteredPlayers
     const isAlreadyEntered = game.enteredPlayers.some((p) => p.toString() === player._id.toString());
-    if (isAlreadyEntered) {
-        throw new Error('Player has already entered this game.');
+
+    if (!isAlreadyEntered) {
+        // Ensure max players limit is not exceeded
+        if (game.enteredPlayers.length >= game.maxPlayers) {
+            throw new Error('Game is full. No more players can enter.');
+        }
+
+        // Add player to enteredPlayers and update the game
+        game.enteredPlayers.push(player._id);
+        await game.save(); // Save the updated game state
     }
 
-    // Ensure max players limit is not exceeded
-    if (game.enteredPlayers.length >= game.maxPlayers) {
-        throw new Error('Game is full. No more players can enter.');
+    // ✅ Fetch updated game with populated players
+    const updatedGame = await Game.findById(gameId).populate('enteredPlayers participants spectators');
+
+    // ✅ Publish player entered event for real-time updates (only if newly added)
+    if (!isAlreadyEntered) {
+        const playerEnteredPayload = {
+            playerEntered: {
+                gameId,
+                walletAddress: player.walletAddress,
+                username: player.username,
+                profileImage: player.profileImage,
+                balance: player.balance,
+            },
+        };
+
+        console.log("📢 Publishing PLAYER_ENTERED:", playerEnteredPayload);
+        await pubsub.publish('PLAYER_ENTERED', playerEnteredPayload);
     }
 
-    // Add player to enteredPlayers and update the game
-    game.enteredPlayers.push(player._id);
-
-    const updatedGame = await Game.findByIdAndUpdate(
-        gameId,
-        { enteredPlayers: game.enteredPlayers },
-        { new: true }
-    ).populate('enteredPlayers participants spectators');
-
-    // ✅ Publish player entered event for real-time updates
-    const playerEnteredPayload = {
-        playerEntered: {
-            gameId,
-            walletAddress: player.walletAddress, // Required for filtering
-            username: player.username,
-            profileImage: player.profileImage,
-            balance: player.balance,
-        },
-    };
-
-    console.log("📢 Publishing PLAYER_ENTERED:", playerEnteredPayload);
-    await pubsub.publish('PLAYER_ENTERED', playerEnteredPayload);
-
-    return updatedGame;
+    return updatedGame; // Always return the updated game state
 };
+
 
 const leaveGame = async (gameId, walletAddress, pubsub) => {
     if (!mongoose.Types.ObjectId.isValid(gameId)) {
@@ -522,6 +381,30 @@ const removeBets = async (gameId, pubsub) => {
     }
 };
 
+const getBetHistoryByWallet = async (walletAddress) => {
+    try {
+        // Step 1: Find the player using wallet address
+        const player = await Player.findOne({ walletAddress });
+        if (!player) {
+            throw new Error("Player not found");
+        }
+        console.log("Player found >>>>>> ", player);
+        // Step 2: Fetch bet history based on player ID
+        const betHistory = await BetHistory.find({ player: player._id })
+            .populate("player", "username") // Populate only the username from Player
+            .select("amount winAmount player");
+        console.log("Bet History >>>>> ", betHistory);
+        // Step 3: Format the response
+        return betHistory.map(bet => ({
+            amount: bet.amount,
+            winAmount: bet.winAmount,
+            username: bet.player?.username || "Unknown", // Handle missing username
+        }));
+    } catch (error) {
+        console.error("Error fetching bet history:", error);
+        throw new Error("Failed to fetch bet history.");
+    }
+};
 
 const getEnteredPlayers = async (gameId) => {
     if (!mongoose.Types.ObjectId.isValid(gameId)) {
@@ -664,4 +547,5 @@ module.exports = {
     getParticipants,
     getBets,
     getAllGames,
+    getBetHistoryByWallet
 };

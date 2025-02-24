@@ -1,4 +1,4 @@
-const { getEnteredPlayers, getParticipants, getBets, getAllGames } = require("../../Services/gameService");
+const { getEnteredPlayers, getParticipants, getBets, getAllGames, getBetHistoryByWallet } = require("../../Services/gameService");
 
 const betsQueries = {
     getEnteredPlayers: async (_, { gameId }) => {
@@ -12,6 +12,9 @@ const betsQueries = {
     },
     getAllGames: async () => {
         return await getAllGames()
+    },
+    getBetHistoryByWallet: async (_, { walletAddress }) => {
+        return await getBetHistoryByWallet(walletAddress);
     }
 };
 
