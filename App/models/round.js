@@ -1,16 +1,18 @@
 const mongoose = require("mongoose");
 
 const roundSchema = new mongoose.Schema({
-    game: { type: mongoose.Schema.Types.ObjectId, ref: "Game", required: true }, // Game reference
-    roundNumber: { type: Number, required: true }, // Unique round number per game
-    participants: [{ type: mongoose.Schema.Types.ObjectId, ref: "Player" }], // Players in this round
-    bets: [{ type: mongoose.Schema.Types.ObjectId, ref: "Bet" }], // Bets placed in this round
-    winner: { type: mongoose.Schema.Types.ObjectId, ref: "Player", default: null }, // Round winner
-    winningBetOption: { type: String, default: null }, // Winning bet option
-    prizeDistributed: { type: Boolean, default: false }, // Has prize been distributed?
-    startedAt: { type: Date, default: Date.now }, // Round start time
-    endedAt: { type: Date, default: null }, // Round end time
-    state: { type: String, enum: ["waiting", "in-progress", "completed"], default: "waiting" } // Round state
+    game: { type: mongoose.Schema.Types.ObjectId, ref: "Game", required: true },
+    roundNumber: { type: Number, required: true },
+    participants: [{ type: mongoose.Schema.Types.ObjectId, ref: "Player" }],
+    bets: [{ type: mongoose.Schema.Types.ObjectId, ref: "Bet" }],
+    totalBetAmount: { type: Number, default: 0 }, // ✅ Total amount wagered in this round
+    profitForHouse: { type: Number, default: 0 }, // ✅ (Total Bets * House Edge %)
+    winner: { type: mongoose.Schema.Types.ObjectId, ref: "Player", default: null },
+    winningBetOption: { type: String, default: null },
+    prizeDistributed: { type: Boolean, default: false },
+    startedAt: { type: Date, default: Date.now },
+    endedAt: { type: Date, default: null },
+    state: { type: String, enum: ["waiting", "in-progress", "completed"], default: "waiting" }
 });
 
 // Ensures unique round numbers per game

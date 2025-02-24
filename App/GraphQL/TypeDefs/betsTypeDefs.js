@@ -55,17 +55,27 @@ const betsTypeDefs = gql`
   }
 
   type Game {
-    _id: ID!
-    name: String!
-    type: String!
-    state: String!
-    enteredPlayers: [Player!]! # Players who entered the game (but may not play)
-    participants: [Player!]! # Players who actually play by placing a bet
-    spectators: [Player!]! # Players who are only watching
-    maxPlayers: Int!
-    maxParticipants: Int! # Limit for actual players who can bet
-    totalBetsAmount: Float!  # ✅ Ensure this field is defined
-  }
+  _id: ID!
+  name: String!
+  type: String!
+  state: String!
+  enteredPlayers: [Player!]!
+  participants: [Player!]!
+  spectators: [Player!]!
+  maxPlayers: Int!
+  maxParticipants: Int!
+  totalRounds: Int!
+  latestRound: Round
+}
+
+type Round {
+  _id: ID!
+  game: ID!
+  participants: [Player!]!
+  bets: [Bet!]!
+  winner: Player
+  roundNumber: Int!
+}
 
   type Player {
     walletAddress: String!

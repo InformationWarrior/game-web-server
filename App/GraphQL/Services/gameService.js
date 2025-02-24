@@ -2,6 +2,201 @@ const mongoose = require('mongoose');
 const Game = require("../../models/game");
 const Player = require("../../models/player");
 const Bet = require("../../models/bet");
+const BetHistory = require("../../models/betHistory");
+const Round = require("../../models/round");
+
+// const createGame = async (name, type, maxPlayers, maxParticipants) => {
+//     const normalizedType = type.toLowerCase();
+
+//     if (!['single', 'multiplayer'].includes(normalizedType)) {
+//         throw new Error('Invalid game type. Allowed values: single, multiplayer.');
+//     }
+
+//     if (maxParticipants > maxPlayers) {
+//         throw new Error('maxParticipants cannot be greater than maxPlayers.');
+//     }
+
+//     // ✅ First, create the round
+//     const firstRound = new Round({
+//         participants: [],
+//         bets: [],
+//         winner: null,
+//         roundNumber: 1
+//     });
+
+//     await firstRound.save();
+
+//     // ✅ Create the game but don't save it yet
+//     const game = new Game({
+//         name,
+//         type: normalizedType,
+//         maxPlayers,
+//         maxParticipants,
+//         state: 'waiting',
+//         enteredPlayers: [],
+//         participants: [],
+//         spectators: [],
+//         rounds: [firstRound._id], // ✅ Store first round
+//         totalRounds: 1, // We will create the first round immediately
+//         latestRound: firstRound._id // ✅ No more null issue
+//     });
+
+//     // ✅ Create the first round
+//     // const firstRound = new Round({
+//     //     game: game._id, // Link the round to this game
+//     //     participants: [],
+//     //     bets: [],
+//     //     winner: null,
+//     //     roundNumber: 1
+//     // });
+
+//     // await firstRound.save();
+
+//     // ✅ Now set the `latestRound` and `rounds` before saving the game
+//     // game.latestRound = firstRound._id;
+//     // game.rounds.push(firstRound._id);
+
+//     await game.save(); // ✅ Save the game only once
+
+//     return game;
+// };
+
+
+// const createGame = async (name, type, maxPlayers, maxParticipants) => {
+//     const normalizedType = type.toLowerCase();
+
+//     if (!['single', 'multiplayer'].includes(normalizedType)) {
+//         throw new Error('Invalid game type. Allowed values: single, multiplayer.');
+//     }
+
+//     if (maxParticipants > maxPlayers) {
+//         throw new Error('maxParticipants cannot be greater than maxPlayers.');
+//     }
+
+//     // ✅ First, create the round
+//     const firstRound = new Round({
+//         participants: [],
+//         bets: [],
+//         winner: null,
+//         roundNumber: 1
+//     });
+
+//     await firstRound.save();
+
+//     // ✅ Then, create the game with latestRound set
+//     const game = new Game({
+//         name,
+//         type: normalizedType,
+//         maxPlayers,
+//         maxParticipants,
+//         state: 'waiting',
+//         enteredPlayers: [],
+//         participants: [],
+//         spectators: [],
+//         rounds: [firstRound._id], // ✅ Store first round
+//         totalRounds: 100000000,
+//         latestRound: firstRound._id // ✅ No more null issue
+//     });
+
+//     await game.save();
+//     return game;
+// };
+
+// const createGame = async (name, type, maxPlayers, maxParticipants) => {
+//     const normalizedType = type.toLowerCase();
+
+//     if (!['single', 'multiplayer'].includes(normalizedType)) {
+//         throw new Error('Invalid game type. Allowed values: single, multiplayer.');
+//     }
+
+//     if (maxParticipants > maxPlayers) {
+//         throw new Error('maxParticipants cannot be greater than maxPlayers.');
+//     }
+
+//     // ✅ Step 1: Create Game (without latestRound)
+//     const game = new Game({
+//         name,
+//         type: normalizedType,
+//         maxPlayers,
+//         maxParticipants,
+//         state: 'waiting',
+//         enteredPlayers: [],
+//         participants: [],
+//         spectators: [],
+//         rounds: [],
+//         totalRounds: 0, 
+//         latestRound: null // Will be updated after round creation
+//     });
+
+//     await game.save();
+
+//     // ✅ Step 2: Create the First Round with `game._id`
+//     const firstRound = new Round({
+//         game: game._id, // ✅ Assign game ID here
+//         participants: [],
+//         bets: [],
+//         winner: null,
+//         roundNumber: 1
+//     });
+
+//     await firstRound.save();
+
+//     // ✅ Step 3: Update Game with latestRound and totalRounds
+//     game.latestRound = firstRound._id;
+//     game.totalRounds = 1;
+//     game.rounds.push(firstRound._id);
+
+//     await game.save();
+
+//     return game;
+// };
+
+// const createGame = async (name, type, maxPlayers, maxParticipants) => {
+//     const normalizedType = type.toLowerCase();
+
+//     if (!['single', 'multiplayer'].includes(normalizedType)) {
+//         throw new Error('Invalid game type. Allowed values: single, multiplayer.');
+//     }
+
+//     if (maxParticipants > maxPlayers) {
+//         throw new Error('maxParticipants cannot be greater than maxPlayers.');
+//     }
+
+//     // ✅ Step 1: Create the Game without saving it
+//     const game = new Game({
+//         name,
+//         type: normalizedType,
+//         maxPlayers,
+//         maxParticipants,
+//         state: 'waiting',
+//         enteredPlayers: [],
+//         participants: [],
+//         spectators: [],
+//         rounds: [],
+//         totalRounds: 0 // ✅ No need to set latestRound to null explicitly
+//     });
+
+//     // ✅ Step 2: Create the First Round
+//     const firstRound = new Round({
+//         game: game._id, // ✅ Assign game ID here
+//         participants: [],
+//         bets: [],
+//         winner: null,
+//         roundNumber: 1
+//     });
+
+//     await firstRound.save();
+
+//     // ✅ Step 3: Assign latestRound and save the Game
+//     game.latestRound = firstRound._id;
+//     game.totalRounds = 1;
+//     game.rounds.push(firstRound._id);
+
+//     await game.save();
+
+//     return game;
+// };
+
 
 const createGame = async (name, type, maxPlayers, maxParticipants) => {
     const normalizedType = type.toLowerCase();
@@ -14,6 +209,7 @@ const createGame = async (name, type, maxPlayers, maxParticipants) => {
         throw new Error('maxParticipants cannot be greater than maxPlayers.');
     }
 
+    // ✅ Step 1: Create Game (but DO NOT save it yet)
     const game = new Game({
         name,
         type: normalizedType,
@@ -22,12 +218,36 @@ const createGame = async (name, type, maxPlayers, maxParticipants) => {
         state: 'waiting',
         enteredPlayers: [],
         participants: [],
-        spectators: []
+        spectators: [],
+        rounds: [],
+        totalRounds: 0,
+        latestRound: null // Will be set later
     });
 
+    // ✅ Step 2: Save Game First (so it gets an ID)
     await game.save();
+
+    // ✅ Step 3: Create First Round with game._id
+    const firstRound = new Round({
+        game: game._id,  // ✅ Ensure game ID is assigned
+        participants: [],
+        bets: [],
+        winner: null,
+        roundNumber: 1
+    });
+
+    await firstRound.save(); // ✅ Save the round first
+
+    // ✅ Step 4: Update Game with latestRound
+    game.latestRound = firstRound._id;
+    game.totalRounds = 1;
+    game.rounds.push(firstRound._id);
+
+    await game.save(); // ✅ Now save the updated game
+
     return game;
 };
+
 
 const enterGame = async (gameId, walletAddress, pubsub) => {
     if (!mongoose.Types.ObjectId.isValid(gameId)) {
@@ -193,24 +413,115 @@ const removeParticipants = async (gameId, pubsub) => {
     }
 };
 
+// const removeBets = async (gameId, pubsub) => {
+//     try {
+//         // Remove all bets for the game
+//         const deletedBets = await Bet.deleteMany({ game: gameId });
+
+//         // Reset total bet amount
+//         await Game.findByIdAndUpdate(gameId, { totalBetsAmount: 0 });
+
+//         // Publish event to notify clients
+//         if (pubsub) {
+//             pubsub.publish("BET_PLACED", { betPlaced: [] });
+//         }
+
+//         return deletedBets.deletedCount > 0;
+//     } catch (error) {
+//         throw new Error(error.message);
+//     }
+// };
+
+
+
+
+// const removeBets = async (gameId, pubsub) => {
+//     try {
+//         // 1. Fetch all bets for the game
+//         const bets = await Bet.find({ game: gameId });
+
+//         if (!bets.length) return false; // No bets to archive
+
+//         // 2. Transform bets to BetHistory format
+//         const archivedBets = bets.map(bet => ({
+//             game: bet.game,
+//             player: bet.player,
+//             amount: bet.amount,
+//             currency: bet.currency,
+//             betOption: bet.betOption,
+//             usdEquivalent: bet.usdEquivalent,
+//             exchangeRate: bet.exchangeRate,
+//             strategy: bet.strategy,
+//             archivedAt: new Date(), // Timestamp for when it was archived
+//         }));
+
+//         // 3. Insert bets into BetHistory
+//         await BetHistory.insertMany(archivedBets);
+
+//         // 4. Remove bets from the active `Bet` collection
+//         await Bet.deleteMany({ game: gameId });
+
+//         // 5. Reset total bet amount for the game
+//         await Game.findByIdAndUpdate(gameId, { totalBetsAmount: 0 });
+
+//         // 6. Publish event to notify clients that all bets were removed
+//         if (pubsub) {
+//             pubsub.publish("BET_PLACED", { betPlaced: [] });
+//         }
+
+//         console.log(`Archived ${bets.length} bets and removed them from active bets.`);
+//         return true;
+//     } catch (error) {
+//         console.error("Error archiving bets:", error);
+//         throw new Error("Failed to archive and remove bets.");
+//     }
+// };
+
+
 const removeBets = async (gameId, pubsub) => {
     try {
-        // Remove all bets for the game
-        const deletedBets = await Bet.deleteMany({ game: gameId });
+        // 1. Fetch all bets for the game
+        const bets = await Bet.find({ game: gameId }).populate("round");
 
-        // Reset total bet amount
+        if (!bets.length) return false; // No bets to archive
+
+        // 2. Transform bets to BetHistory format (Include round and gameStateAtBet)
+        const archivedBets = bets.map(bet => ({
+            game: bet.game,
+            player: bet.player,
+            amount: bet.amount,
+            currency: bet.currency,
+            betOption: bet.betOption,
+            usdEquivalent: bet.usdEquivalent,
+            exchangeRate: bet.exchangeRate,
+            strategy: bet.strategy,
+            round: bet.round?._id, // Ensure round is included
+            gameStateAtBet: bet.gameStateAtBet || "default_state", // Provide a valid value
+            archivedAt: new Date(), // Timestamp for when it was archived
+        }));
+
+        // 3. Insert bets into BetHistory
+        await BetHistory.insertMany(archivedBets);
+
+        // 4. Remove bets from the active `Bet` collection
+        await Bet.deleteMany({ game: gameId });
+
+        // 5. Reset total bet amount for the game
         await Game.findByIdAndUpdate(gameId, { totalBetsAmount: 0 });
 
-        // Publish event to notify clients
+        // 6. Publish event to notify clients that all bets were removed
         if (pubsub) {
             pubsub.publish("BET_PLACED", { betPlaced: [] });
         }
 
-        return deletedBets.deletedCount > 0;
+        console.log(`Archived ${bets.length} bets and removed them from active bets.`);
+        return true;
     } catch (error) {
-        throw new Error(error.message);
+        console.error("Error archiving bets:", error);
+        throw new Error("Failed to archive and remove bets.");
     }
 };
+
 
 const getEnteredPlayers = async (gameId) => {
     if (!mongoose.Types.ObjectId.isValid(gameId)) {

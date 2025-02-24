@@ -16,6 +16,10 @@ const placeBetAndParticipate = async (gameId, walletAddress, betAmount, currency
         // 3. Validate balance
         // if (player.balance < betAmount) throw new Error("Insufficient balance");
 
+        // 4. Get current round
+        const latestRound = game.latestRound; // Ensure this field exists in the Game model
+        if (!latestRound) throw new Error("Latest round is missing");
+
         // 4. Check if player is already a participant
         if (game.participants.includes(player._id)) throw new Error("Player has already placed a bet");
 
@@ -30,6 +34,7 @@ const placeBetAndParticipate = async (gameId, walletAddress, betAmount, currency
         const bet = new Bet({
             game: gameId,
             player: player._id,
+            round: latestRound, // 🔥 **Adding required round**
             amount: betAmount,
             currency: currency, // Assuming default currency
             betOption: "default", // Add logic to pass actual bet option
