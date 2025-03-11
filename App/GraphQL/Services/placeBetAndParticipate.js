@@ -1,7 +1,7 @@
 const Game = require("../../models/game");
 const Player = require("../../models/player");
+const Round = require("../../models/round");
 const Bet = require("../../models/bet");
-
 
 const placeBetAndParticipate = async (gameId, walletAddress, betAmount, currency, pubsub) => {
     try {
@@ -13,50 +13,89 @@ const placeBetAndParticipate = async (gameId, walletAddress, betAmount, currency
         const player = await Player.findOne({ walletAddress });
         if (!player) throw new Error("Player not found");
 
-        // 3. Validate balance
-        // if (player.balance < betAmount) throw new Error("Insufficient balance");
-
-        // 4. Get current round
-        const latestRound = game.latestRound; // Ensure this field exists in the Game model
+        // 3. Get the latest round
+        const latestRound = await Round.findById(game.latestRound);
         if (!latestRound) throw new Error("Latest round is missing");
 
-        // 4. Check if player is already a participant
-        if (game.participants.includes(player._id)) throw new Error("Player has already placed a bet");
+        // 4. Ensure the player hasn't already participated
+        if (latestRound.participants.includes(player._id)) throw new Error("Player has already placed a bet");
 
-        // 5. Deduct bet amount & save player
-        // player.balance -= betAmount;
-        await player.save();
+        // 5. Add player to round participants
+        latestRound.participants.push(player._id);
 
-        // 6. Add player as a participant (store reference)
-        game.participants.push(player._id);
-
-        // 7. Create & save bet
+        // 6. Create and save the bet
         const bet = new Bet({
             game: gameId,
             player: player._id,
-            round: latestRound, // 🔥 **Adding required round**
+            round: latestRound._id, // ✅ Link the bet to this round
             amount: betAmount,
-            currency: currency, // Assuming default currency
-            betOption: "default", // Add logic to pass actual bet option
-            usdEquivalent: betAmount * 0.5, // Example conversion, replace with actual rate
-            exchangeRate: 0.5, // Replace with actual rate
+            currency,
+            betOption: "default",
+            usdEquivalent: betAmount * 0.5, // Example conversion
+            exchangeRate: 0.5, // Replace with actual exchange rate
             strategy: "manual",
         });
         await bet.save();
 
-        // 8. Update total bet amount
-        // game.totalBetsAmount += betAmount;
-        await game.save();
+        // 🔹 **Push the bet into the `bets` array of the round**
+        latestRound.bets.push(bet._id);
 
-        // 9. Publish subscription events
-        const participantPayload = { walletAddress, username: player.username, betAmount, currency };
+        // 7. Save round changes (✅ Now includes bets)
+        await latestRound.save();
+
+        // 8. Fetch updated participants and bets
+        const participants = await Player.find({ _id: { $in: latestRound.participants } }).select("walletAddress username");
+        const bets = await Bet.find({ round: latestRound._id }).populate("player");
+
+        // 9. Calculate total bet amount
+        const totalBetAmount = bets.reduce((sum, bet) => sum + bet.amount, 0);
+
+        // 11. Prepare the `RoundUpdatedPayload`
+        const roundPayload = {
+            _id: latestRound._id,
+            gameId: game._id.toString(),
+            roundNumber: latestRound.roundNumber,
+            participants: participants.map((p) => {
+                const playerBet = bets.find((b) => b.player.walletAddress === p.walletAddress);
+                const playerBetAmount = playerBet ? playerBet.amount : 0;
+                const playerWinningChance = totalBetAmount > 0 ? (playerBetAmount / totalBetAmount) * 100 : 0;
+
+                return {
+                    walletAddress: p.walletAddress,
+                    username: p.username,
+                    betAmount: playerBetAmount,
+                    currency: playerBet ? playerBet.currency : "ETH",
+                    winningChance: playerWinningChance,
+                };
+            }),
+            bets: bets.map((bet) => ({
+                id: bet.id,
+                game: bet.game,
+                player: {
+                    walletAddress: bet.player.walletAddress,
+                    username: bet.player.username,
+                },
+                amount: bet.amount,
+                currency: bet.currency,
+                betOption: bet.betOption,
+                usdEquivalent: bet.usdEquivalent,
+                exchangeRate: bet.exchangeRate,
+                transactionHash: bet.transactionHash || "",
+                timestamp: bet.timestamp.toISOString(),
+                multiBet: bet.multiBet || false,
+                strategy: bet.strategy,
+            })),
+            totalBetAmount,
+            winner: latestRound.winner || null,
+            startedAt: latestRound.startedAt.toISOString(),
+        };
+
+        // 12. Publish **roundUpdated** subscription
         if (pubsub) {
-            pubsub.publish("PLAYER_PARTICIPATED", { playerParticipated: participantPayload });
-
-            pubsub.publish("BET_PLACED", { betPlaced: bet });
+            pubsub.publish("ROUND_UPDATED", { roundUpdated: roundPayload });
         }
 
-        return participantPayload;
+        return roundPayload; // ✅ Return updated round details
     } catch (error) {
         throw new Error(error.message);
     }

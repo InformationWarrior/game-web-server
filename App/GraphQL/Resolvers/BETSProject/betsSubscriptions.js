@@ -6,10 +6,6 @@ const betsSubscriptions = {
         subscribe: () => pubsub.asyncIterator("GAME_STATUS_UPDATED")
     },
 
-    playerParticipated: {
-        subscribe: () => pubsub.asyncIterator(["PLAYER_PARTICIPATED"]),
-    },
-
     playerEntered: {
         subscribe: withFilter(
             () => pubsub.asyncIterator('PLAYER_ENTERED'),
@@ -23,15 +19,10 @@ const betsSubscriptions = {
         ),
     },
 
-    betPlaced: {
+    roundUpdated: {
         subscribe: withFilter(
-            () => pubsub.asyncIterator("BET_PLACED"),
-            (payload, variables) => {
-                return (
-                    payload.betPlaced.game === variables.gameId &&
-                    payload.betPlaced.player.walletAddress === variables.walletAddress
-                );
-            }
+            () => pubsub.asyncIterator("ROUND_UPDATED"),
+            (payload, variables) => payload.roundUpdated.gameId === variables.gameId
         ),
     },
 };

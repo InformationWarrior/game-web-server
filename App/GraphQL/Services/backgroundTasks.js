@@ -1,4 +1,4 @@
-const gameStateUpdate = require("./gameStateUpdate")
+const gameStateUpdate = require("../Services/StatePattern/gameStateUpdate");
 
 const startBackgroundTasks = () => {
     console.log("✅ Background tasks running...");

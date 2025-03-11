@@ -3,7 +3,7 @@ const mongoose = require("mongoose");
 const betSchema = new mongoose.Schema({
     player: { type: mongoose.Schema.Types.ObjectId, ref: "Player", required: true },
     game: { type: mongoose.Schema.Types.ObjectId, ref: "Game", required: true },
-    round: { type: mongoose.Schema.Types.ObjectId, ref: "Round", required: true }, // ✅ Added round for efficient tracking
+    round: { type: mongoose.Schema.Types.ObjectId, ref: "Round", required: true }, // Tracks the specific round
     amount: { type: Number, required: true },
     currency: { type: String, enum: ["ETH", "BTC", "USDT", "BETS"], required: true },
     usdEquivalent: { type: Number, required: true },
@@ -15,13 +15,17 @@ const betSchema = new mongoose.Schema({
     autoBetSettings: { type: mongoose.Schema.Types.Mixed, default: {} },
     timestamp: { type: Date, default: Date.now },
 
-    // ✅ Auto-delete bets after a certain time to avoid manual cleanup
-    // expiresAt: { type: Date, index: { expires: "10m" } }, // 10 minutes after round ends
+    // ✅ History fields (previously in BetHistory)
+    gameStateAtBet: { type: String, required: false }, // "pre-spin", "in-progress", "completed"
+    winAmount: { type: Number, default: 0 }, // Stores winnings if bet wins
+    isWin: { type: Boolean, default: false }, // Marks if the bet was successful
+    archivedAt: { type: Date, default: null }, // When the bet was considered historical (null for active bets)
 });
 
 // ✅ Optimized Indexing Strategy
-betSchema.index({ game: 1, round: 1, player: 1 }); // Queries related to game, round, and player
-betSchema.index({ timestamp: -1 }); // Queries sorting by time
+betSchema.index({ game: 1, round: 1, player: 1 }); // Fast lookup of bets by round & game
+betSchema.index({ timestamp: -1 }); // Sorting by time for active bets
+betSchema.index({ player: 1, archivedAt: -1 }); // Sorting historical bets for players
 
 const Bet = mongoose.model("Bet", betSchema);
 module.exports = Bet;

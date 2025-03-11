@@ -4,19 +4,18 @@ const gameSchema = new mongoose.Schema({
   name: { type: String, required: true },
   type: { type: String, enum: ["single", "multiplayer"], required: true },
 
+  // ✅ Only tracks players who entered but haven't placed a bet yet
   enteredPlayers: [{ type: mongoose.Schema.Types.ObjectId, ref: "Player" }],
-  participants: [{ type: mongoose.Schema.Types.ObjectId, ref: "Player" }],
   spectators: [{ type: mongoose.Schema.Types.ObjectId, ref: "Player" }],
 
   maxPlayers: { type: Number, default: 500 },
-  maxParticipants: { type: Number, default: 10 },
 
-  state: { type: String, enum: ["waiting", "in-progress", "completed"], default: "waiting" },
+  // Use a game-wide state if needed (e.g., "active", "paused", "ended").
+  state: { type: String, enum: ["active", "paused", "ended"], default: "active" },
   entryFee: { type: Number, default: 0 },
   prizePool: { type: Number, default: 0 },
   jackpot: { type: Number, default: 0 },
-  betOptions: [{ option: String, odds: Number }],
-  totalBetsAmount: { type: Number, default: 0 },
+  betOptions: [{ option: String, odds: Number }], // Betting choices
 
   duration: { type: Number, default: null },
   expiresAt: { type: Date, default: null },
@@ -36,7 +35,7 @@ const gameSchema = new mongoose.Schema({
   currency: { type: String, enum: ["ETH", "BTC", "USDT", "BETS"], default: "ETH" },
   createdAt: { type: Date, default: Date.now },
 
-  // ✅ Reference to the latest round instead of storing rounds inside Game
+  // ✅ Only references rounds; does not store participants/bets
   rounds: [{ type: mongoose.Schema.Types.ObjectId, ref: "Round" }],
   latestRound: { type: mongoose.Schema.Types.ObjectId, ref: "Round", default: null },
   totalRounds: { type: Number, default: 0 }, // Count total rounds for this game
@@ -58,7 +57,7 @@ const gameSchema = new mongoose.Schema({
   jackpotWinners: [{ type: mongoose.Schema.Types.ObjectId, ref: "Player" }],
   mode: { type: String, enum: ["standard", "tournament", "practice"], default: "standard" },
   customRules: { type: [String], default: [] },
-  config: { type: mongoose.Schema.Types.Mixed, default: {} } // For game-specific settings
+  config: { type: mongoose.Schema.Types.Mixed, default: {} } // Game-specific settings
 });
 
 // ✅ Indexing for performance
