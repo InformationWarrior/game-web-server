@@ -71,57 +71,6 @@ const createGame = async (name, type, maxPlayers) => {
     return payload;
 };
 
-// const enterGame = async (gameId, walletAddress, pubsub) => {
-//     if (!mongoose.Types.ObjectId.isValid(gameId)) {
-//         throw new Error('Invalid game ID format');
-//     }
-
-//     const game = await Game.findById(gameId);
-//     if (!game) {
-//         throw new Error('Game not found');
-//     }
-
-//     const player = await Player.findOne({ walletAddress });
-//     if (!player) {
-//         throw new Error('Player not found');
-//     }
-
-//     // ✅ Check if player is already in enteredPlayers
-//     const isAlreadyEntered = game.enteredPlayers.some((p) => p.toString() === player._id.toString());
-
-//     if (!isAlreadyEntered) {
-//         // Ensure max players limit is not exceeded
-//         if (game.enteredPlayers.length >= game.maxPlayers) {
-//             throw new Error('Game is full. No more players can enter.');
-//         }
-
-//         // Add player to enteredPlayers and update the game
-//         game.enteredPlayers.push(player._id);
-//         await game.save(); // Save the updated game state
-//     }
-
-//     // ✅ Fetch updated game with populated players
-//     const updatedGame = await Game.findById(gameId).populate('enteredPlayers spectators');
-
-//     // ✅ Publish player entered event for real-time updates (only if newly added)
-//     if (!isAlreadyEntered) {
-//         const playerEnteredPayload = {
-//             playerEntered: {
-//                 gameId,
-//                 walletAddress: player.walletAddress,
-//                 username: player.username,
-//                 profileImage: player.profileImage,
-//                 balance: player.balance,
-//             },
-//         };
-
-//         console.log("📢 Publishing PLAYER_ENTERED:", playerEnteredPayload);
-//         await pubsub.publish('PLAYER_ENTERED', playerEnteredPayload);
-//     }
-
-//     return updatedGame; // Always return the updated game state
-// };
-
 const enterGame = async (gameId, walletAddress, pubsub) => {
     if (!mongoose.Types.ObjectId.isValid(gameId)) {
         throw new Error("Invalid game ID format");
@@ -256,66 +205,6 @@ const getEnteredPlayers = async (gameId) => {
     }
 };
 
-
-// const getParticipants = async (gameId) => {
-//     try {
-//         if (!mongoose.Types.ObjectId.isValid(gameId)) {
-//             throw new Error("Invalid game ID format");
-//         }
-
-//         // ✅ Fetch the latest round for the game
-//         const latestRound = await Round.findOne({ game: gameId })
-//             .sort({ roundNumber: -1 }) // Get the most recent round
-//             .populate({
-//                 path: "participants",
-//                 select: "walletAddress username",
-//             });
-
-//         if (!latestRound) throw new Error("No rounds found for this game");
-
-//         // ✅ Fetch bets for participants in the latest round
-//         const bets = await Bet.find({ round: latestRound._id }).select("player amount currency");
-//         const betMap = new Map(bets.map(bet => [bet.player.toString(), { amount: bet.amount, currency: bet.currency }]));
-
-//         // ✅ Return participants with their bet data
-//         return latestRound.participants.map((participant) => ({
-//             walletAddress: participant.walletAddress,
-//             username: participant.username,
-//             betAmount: betMap.get(participant._id.toString())?.amount || 0,
-//             currency: betMap.get(participant._id.toString())?.currency || "ETH",
-//         }));
-//     } catch (error) {
-//         throw new Error(error.message);
-//     }
-// };
-
-// const getBets = async (gameId) => {
-//     try {
-//         // Find all bets for the game and return only required fields
-//         const bets = await Bet.find({ game: gameId }).populate("player", "walletAddress username");
-
-//         return bets.map((bet) => ({
-//             id: bet.id,
-//             game: bet.game,
-//             player: bet.player ? {
-//                 walletAddress: bet.player.walletAddress || "Unknown",
-//                 username: bet.player.username || "Unknown"
-//             } : { walletAddress: "Unknown", username: "Unknown" },
-//             amount: bet.amount,
-//             currency: bet.currency,
-//             betOption: bet.betOption,
-//             usdEquivalent: bet.usdEquivalent,
-//             exchangeRate: bet.exchangeRate,
-//             transactionHash: bet.transactionHash,
-//             timestamp: bet.timestamp,
-//             multiBet: bet.multiBet,
-//             strategy: bet.strategy,
-//         }));
-//     } catch (error) {
-//         throw new Error(error.message);
-//     }
-// };
-
 const getParticipantsAndBets = async (gameId) => {
     try {
         if (!mongoose.Types.ObjectId.isValid(gameId)) {
@@ -436,10 +325,7 @@ module.exports = {
     enterGame,
     leaveGame,
     getParticipantsAndBets,
-    // participateInGame,
     getEnteredPlayers,
-    // getParticipants,
-    // getBets,
     getAllGames,
     getBetHistoryByWallet
 };
