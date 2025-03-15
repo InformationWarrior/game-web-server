@@ -2,9 +2,9 @@ const { mergeResolvers } = require('@graphql-tools/merge');
 
 const objectIdScalar = require('../ObjectIdScalar');
 
-const betsQueries = require('./BETSProject/betsQueries');
-const betsMutations = require('./BETSProject/betsMutations');
-const betsSubscriptions = require('./BETSProject/betsSubscriptions');
+const betsQueries = require('./betsQueries');
+const betsMutations = require('./betsMutations');
+const betsSubscriptions = require('./betsSubscriptions');
 
 const resolvers = mergeResolvers([
     { ObjectId: objectIdScalar },

@@ -1,5 +1,5 @@
 const { withFilter } = require("graphql-subscriptions");
-const pubsub = require('../../pubsub');
+const pubsub = require('../pubsub');
 
 const betsSubscriptions = {
     gameStatusUpdated: {
@@ -23,6 +23,13 @@ const betsSubscriptions = {
         subscribe: withFilter(
             () => pubsub.asyncIterator("ROUND_UPDATED"),
             (payload, variables) => payload.roundUpdated.gameId === variables.gameId
+        ),
+    },
+
+    winnerDetermined: {
+        subscribe: withFilter(
+            () => pubsub.asyncIterator(["WINNER_DETERMINED"]),
+            (payload, variables) => payload.winnerDetermined.gameId === variables.gameId
         ),
     },
 };

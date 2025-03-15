@@ -1,5 +1,5 @@
-const { getEnteredPlayers, getParticipantsAndBets, getAllGames, getBetHistoryByWallet } = require("../../Services/gameService");
-const { getRound } = require("../../Services/roundService");
+const { getEnteredPlayers, getParticipantsAndBets, getAllGames, getBetHistoryByWallet } = require("../Services/gameService");
+const { getRound } = require("../Services/roundService");
 
 const betsQueries = {
     getEnteredPlayers: async (_, { gameId }) => {

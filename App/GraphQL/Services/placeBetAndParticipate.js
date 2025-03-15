@@ -44,7 +44,7 @@ const placeBetAndParticipate = async (gameId, walletAddress, betAmount, currency
         await latestRound.save();
 
         // 8. Fetch updated participants and bets
-        const participants = await Player.find({ _id: { $in: latestRound.participants } }).select("walletAddress username");
+        const participants = await Player.find({ _id: { $in: latestRound.participants } }).select("walletAddress username color");
         const bets = await Bet.find({ round: latestRound._id }).populate("player");
 
         // 9. Calculate total bet amount
@@ -58,11 +58,14 @@ const placeBetAndParticipate = async (gameId, walletAddress, betAmount, currency
             participants: participants.map((p) => {
                 const playerBet = bets.find((b) => b.player.walletAddress === p.walletAddress);
                 const playerBetAmount = playerBet ? playerBet.amount : 0;
-                const playerWinningChance = totalBetAmount > 0 ? (playerBetAmount / totalBetAmount) * 100 : 0;
+                const playerWinningChance = totalBetAmount > 0
+                    ? ((playerBetAmount / totalBetAmount) * 100).toFixed(2)
+                    : "0.00";
 
                 return {
                     walletAddress: p.walletAddress,
                     username: p.username,
+                    color: p.color || "#FFFFFF",
                     betAmount: playerBetAmount,
                     currency: playerBet ? playerBet.currency : "ETH",
                     winningChance: playerWinningChance,
@@ -74,6 +77,7 @@ const placeBetAndParticipate = async (gameId, walletAddress, betAmount, currency
                 player: {
                     walletAddress: bet.player.walletAddress,
                     username: bet.player.username,
+                    color: bet.player.color || "#FFFFFF",
                 },
                 amount: bet.amount,
                 currency: bet.currency,

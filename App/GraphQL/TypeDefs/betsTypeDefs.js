@@ -41,6 +41,7 @@ const betsTypeDefs = gql`
     playerEntered(gameId: ID!, walletAddress: String!): PlayerEnteredPayload!
     gameStatusUpdated: GameStatus!
     roundUpdated(gameId: ID!): RoundUpdatedPayload!
+    winnerDetermined(gameId: ID!): WinnerDeterminedPayload!
   }
 
   # Game Related Types
@@ -120,6 +121,7 @@ const betsTypeDefs = gql`
   type ParticipantPayload {
     walletAddress: String!
     username: String!
+    color: String!
     betAmount: Float!
     currency: String!
     winningChance: Float!
@@ -165,6 +167,7 @@ const betsTypeDefs = gql`
   type Player {
     walletAddress: String!
     username: String!
+    color: String!
     profileImage: String
     balance: Float!
     currency: String!
@@ -178,6 +181,7 @@ const betsTypeDefs = gql`
   type PlayerInfo {
     walletAddress: String!
     username: String!
+    color: String!
   }
 
   type CreatePlayerPayload {
@@ -190,6 +194,19 @@ const betsTypeDefs = gql`
     gameId: ID!
     walletAddress: String!
     username: String!
+  }
+
+  type WinnerDeterminedPayload {
+    gameId: ID!
+    roundNumber: Int!
+    winner: Winner!
+  }
+
+  type Winner {
+    _id: ID!
+    username: String!
+    walletAddress: String!
+    color: String!
   }
 `;
 

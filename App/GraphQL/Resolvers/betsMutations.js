@@ -1,7 +1,7 @@
-const { createGame, enterGame, leaveGame } = require("../../Services/gameService");
-const { createPlayer } = require('../../Services/gameService');
-const { placeBetAndParticipate } = require("../../Services/placeBetAndParticipate");
-const pubsub = require("../../pubsub");
+const { createGame, enterGame, leaveGame } = require("../Services/gameService");
+const { createPlayer } = require('../Services/gameService');
+const { placeBetAndParticipate } = require("../Services/placeBetAndParticipate");
+const pubsub = require("../pubsub");
 
 const betsMutations = {
     createGame: async (_, { name, type, maxPlayers }) => {

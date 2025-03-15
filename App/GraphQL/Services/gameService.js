@@ -4,6 +4,7 @@ const Player = require("../../models/player");
 const Bet = require("../../models/bet");
 const BetHistory = require("../../models/betHistory");
 const Round = require("../../models/round");
+const { generateUniqueColor } = require("../Utils/colorUtils");
 
 const createGame = async (name, type, maxPlayers) => {
     const normalizedType = type.toLowerCase();
@@ -69,6 +70,57 @@ const createGame = async (name, type, maxPlayers) => {
     };
 
     return payload;
+};
+
+const createPlayer = async (walletAddress, username, balance, currency) => {
+    try {
+        let player = await Player.findOne({ walletAddress });
+
+        // ✅ Player exists → Update username & save
+        if (player) {
+            console.log(`[INFO] Player exists. Updating player: ${walletAddress} -> ${username}`);
+            player.username = username;
+            player.balance = balance;
+            player.transactions.push({
+                type: "deposit",
+                amount: balance,
+                currency,
+            });
+            await player.save();
+        }
+        // ✅ Player does not exist → Create new player
+        else {
+            console.log(`[INFO] Creating new player: ${walletAddress}, Username: ${username}`);
+
+            const uniqueColor = await generateUniqueColor();
+
+            player = new Player({
+                walletAddress,
+                username,
+                balance,
+                color: uniqueColor,
+                transactions: [
+                    {
+                        type: "deposit",
+                        amount: balance,
+                        currency,
+                    },
+                ],
+            });
+            await player.save();
+        }
+
+        console.log(`[SUCCESS] Player saved: ${walletAddress}`);
+
+        return {
+            success: true,
+            message: player ? 'Player updated successfully' : 'Player created successfully',
+            player,
+        };
+    } catch (error) {
+        console.error(`[ERROR] Failed to create/update player: ${error.message}`);
+        throw new Error(`Error creating player: ${error.message}`);
+    }
 };
 
 const enterGame = async (gameId, walletAddress, pubsub) => {
@@ -260,53 +312,6 @@ const getParticipantsAndBets = async (gameId) => {
         return { participants, bets: formattedBets };
     } catch (error) {
         throw new Error(error.message);
-    }
-};
-
-const createPlayer = async (walletAddress, username, balance, currency) => {
-    try {
-        let player = await Player.findOne({ walletAddress });
-
-        // ✅ Player exists → Update username & save
-        if (player) {
-            console.log(`[INFO] Player exists. Updating player: ${walletAddress} -> ${username}`);
-            player.username = username;
-            player.balance = balance;
-            player.transactions.push({
-                type: "deposit",
-                amount: balance,
-                currency,
-            });
-            await player.save();
-        }
-        // ✅ Player does not exist → Create new player
-        else {
-            console.log(`[INFO] Creating new player: ${walletAddress}, Username: ${username}`);
-            player = new Player({
-                walletAddress,
-                username,
-                balance,
-                transactions: [
-                    {
-                        type: "deposit",
-                        amount: balance,
-                        currency,
-                    },
-                ],
-            });
-            await player.save();
-        }
-
-        console.log(`[SUCCESS] Player saved: ${walletAddress}`);
-
-        return {
-            success: true,
-            message: player ? 'Player updated successfully' : 'Player created successfully',
-            player,
-        };
-    } catch (error) {
-        console.error(`[ERROR] Failed to create/update player: ${error.message}`);
-        throw new Error(`Error creating player: ${error.message}`);
     }
 };
 

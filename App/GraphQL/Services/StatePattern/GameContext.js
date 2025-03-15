@@ -130,6 +130,77 @@ class GameContext {
         }
     }
 
+    async determineWinner(gameId) {
+        try {
+            const game = await Game.findById(gameId);
+            if (!game) throw new Error("Game not found");
+
+            const latestRound = await Round.findById(game.latestRound);
+            if (!latestRound) throw new Error("Latest round not found");
+
+            const bets = await Bet.find({ round: latestRound._id }).populate("player");
+
+            if (bets.length === 0) {
+                console.log("No bets placed. No winner selected.");
+                return;
+            }
+
+            // Compute total bet amount for weighted selection
+            const totalBetAmount = bets.reduce((sum, bet) => sum + bet.amount, 0);
+
+            // Create a weighted pool for selection
+            let weightedPool = [];
+            for (const bet of bets) {
+                const weight = bet.amount / totalBetAmount; // Probability weight
+                weightedPool.push({ player: bet.player, weight });
+            }
+
+            // Select winner using weighted probability
+            let random = Math.random();
+            let cumulativeWeight = 0;
+            let winner = null;
+
+            for (const entry of weightedPool) {
+                cumulativeWeight += entry.weight;
+                if (random <= cumulativeWeight) {
+                    winner = entry.player;
+                    break;
+                }
+            }
+
+            if (!winner) {
+                console.log("Winner selection failed, picking first player as fallback.");
+                winner = bets[0].player;
+            }
+
+            // Update round with the winner
+            latestRound.winner = winner._id;
+            await latestRound.save();
+
+            // Update game with latest winner
+            game.topWinners.push(winner._id);
+            await game.save();
+
+            // Publish winner event
+            console.log(`🏆 Winner determined: ${winner.username} (${winner.walletAddress})`);
+            pubsub.publish("WINNER_DETERMINED", {
+                winnerDetermined: {
+                    gameId: gameId.toString(),
+                    roundNumber: latestRound.roundNumber,
+                    winner: {
+                        _id: winner._id.toString(),
+                        username: winner.username,
+                        walletAddress: winner.walletAddress
+                    },
+                    // endedAt: latestRound.endedAt.toISOString()
+                }
+            });
+
+        } catch (error) {
+            console.error("❌ Error determining winner:", error);
+        }
+    }
+
     start() {
         this.state.handle(this);
     }

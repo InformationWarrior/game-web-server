@@ -4,6 +4,7 @@ const playerSchema = new mongoose.Schema({
   walletAddress: { type: String, required: true, unique: true },
   username: { type: String, default: null },
   profileImage: { type: String, default: null },
+  color: { type: String, unique: true, required: true },
   balance: { type: Number, default: 0 },
   totalWins: { type: Number, default: 0 },
   totalLosses: { type: Number, default: 0 },
